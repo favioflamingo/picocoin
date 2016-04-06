@@ -1,9 +1,9 @@
-
-AM_CPPFLAGS	= -I$(top_srcdir)/include
+AM_CPPFLAGS	=   -I$(top_srcdir)/include
 
 lib_LTLIBRARIES= libccoin.la
 
 libccoin_la_LIBADD= -lm
+
 libccoin_la_SOURCES=	\
 	address.c	\
 	addr_match.c	\
@@ -41,5 +41,6 @@ libccoin_la_SOURCES=	\
 	util.c		\
 	utxo.c		\
 	wallet.c
+
 # is the soname version info going to just be libccoin.so.0.0.0
 # libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:1
