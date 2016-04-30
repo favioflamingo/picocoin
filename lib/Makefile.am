@@ -42,4 +42,4 @@ libccoin_la_SOURCES=	\
 	utxo.c		\
 	wallet.c
 
-libccoin_la_LDFLAGS = -module -shared  -version-info 1:0:0
+libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:1
