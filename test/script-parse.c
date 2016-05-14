@@ -114,10 +114,10 @@ static void runtest(const char *ser_fn_base)
 
 int main (int argc, char *argv[])
 {
-	const char *opn = GetOpName(OP_PUBKEY);
-	assert(!strcmp(opn, "OP_PUBKEY"));
+	const char *opn = GetOpName(ccoin_OP_PUBKEY);
+	assert(!strcmp(opn, "ccoin_OP_PUBKEY"));
 
-	opn = GetOpName(OP_INVALIDOPCODE);
+	opn = GetOpName(ccoin_OP_INVALIDOPCODE);
 	assert(!strcmp(opn, "<unknown>"));
 
 	runtest("blk120383.ser");

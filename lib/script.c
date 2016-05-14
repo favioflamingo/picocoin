@@ -23,22 +23,22 @@ bool bsp_getop(struct bscript_op *op, struct bscript_parser *bp)
 
 	uint32_t data_len;
 
-	if (opcode < OP_PUSHDATA1)
+	if (opcode < ccoin_OP_PUSHDATA1)
 		data_len = opcode;
 
-	else if (opcode == OP_PUSHDATA1) {
+	else if (opcode == ccoin_OP_PUSHDATA1) {
 		uint8_t v8;
 		if (!deser_bytes(&v8, bp->buf, 1))
 			goto err_out;
 		data_len = v8;
 	}
-	else if (opcode == OP_PUSHDATA2) {
+	else if (opcode == ccoin_OP_PUSHDATA2) {
 		uint16_t v16;
 		if (!deser_u16(&v16, bp->buf))
 			goto err_out;
 		data_len = v16;
 	}
-	else if (opcode == OP_PUSHDATA4) {
+	else if (opcode == ccoin_OP_PUSHDATA4) {
 		uint32_t v32;
 		if (!deser_u32(&v32, bp->buf))
 			goto err_out;
@@ -105,13 +105,13 @@ static bool is_bsp_op(const struct bscript_op *op, enum opcodetype opcode)
 	return (op->op == opcode);
 }
 
-static bool is_bsp_op_smallint(const struct bscript_op *op)
+static bool is_bsp_ccoin_OP_smallint(const struct bscript_op *op)
 {
-	return ((op->op == OP_0) ||
-		(op->op >= OP_1 && op->op <= OP_16));
+	return ((op->op == ccoin_OP_0) ||
+		(op->op >= ccoin_OP_1 && op->op <= ccoin_OP_16));
 }
 
-static bool is_bsp_op_pubkey(const struct bscript_op *op)
+static bool is_bsp_ccoin_OP_pubkey(const struct bscript_op *op)
 {
 	if (!is_bsp_pushdata(op->op))
 		return false;
@@ -120,7 +120,7 @@ static bool is_bsp_op_pubkey(const struct bscript_op *op)
 	return true;
 }
 
-static bool is_bsp_op_pubkeyhash(const struct bscript_op *op)
+static bool is_bsp_ccoin_OP_pubkeyhash(const struct bscript_op *op)
 {
 	if (!is_bsp_pushdata(op->op))
 		return false;
@@ -129,46 +129,46 @@ static bool is_bsp_op_pubkeyhash(const struct bscript_op *op)
 	return true;
 }
 
-// OP_PUBKEY, OP_CHECKSIG
+// ccoin_OP_PUBKEY, ccoin_OP_CHECKSIG
 bool is_bsp_pubkey(parr *ops)
 {
 	return ((ops->len == 2) &&
-	        is_bsp_op(parr_idx(ops, 1), OP_CHECKSIG) &&
-	        is_bsp_op_pubkey(parr_idx(ops, 0)));
+	        is_bsp_op(parr_idx(ops, 1), ccoin_OP_CHECKSIG) &&
+	        is_bsp_ccoin_OP_pubkey(parr_idx(ops, 0)));
 }
 
-// OP_DUP, OP_HASH160, OP_PUBKEYHASH, OP_EQUALVERIFY, OP_CHECKSIG,
+// ccoin_OP_DUP, ccoin_OP_HASH160, ccoin_OP_PUBKEYHASH, ccoin_OP_EQUALVERIFY, ccoin_OP_CHECKSIG,
 bool is_bsp_pubkeyhash(parr *ops)
 {
 	return ((ops->len == 5) &&
-	        is_bsp_op(parr_idx(ops, 0), OP_DUP) &&
-	        is_bsp_op(parr_idx(ops, 1), OP_HASH160) &&
-	        is_bsp_op_pubkeyhash(parr_idx(ops, 2)) &&
-	        is_bsp_op(parr_idx(ops, 3), OP_EQUALVERIFY) &&
-	        is_bsp_op(parr_idx(ops, 4), OP_CHECKSIG));
+	        is_bsp_op(parr_idx(ops, 0), ccoin_OP_DUP) &&
+	        is_bsp_op(parr_idx(ops, 1), ccoin_OP_HASH160) &&
+	        is_bsp_ccoin_OP_pubkeyhash(parr_idx(ops, 2)) &&
+	        is_bsp_op(parr_idx(ops, 3), ccoin_OP_EQUALVERIFY) &&
+	        is_bsp_op(parr_idx(ops, 4), ccoin_OP_CHECKSIG));
 }
 
-// OP_HASH160, OP_PUBKEYHASH, OP_EQUAL
+// ccoin_OP_HASH160, ccoin_OP_PUBKEYHASH, ccoin_OP_EQUAL
 bool is_bsp_scripthash(parr *ops)
 {
 	return ((ops->len == 3) &&
-	        is_bsp_op(parr_idx(ops, 0), OP_HASH160) &&
-	        is_bsp_op_pubkeyhash(parr_idx(ops, 1)) &&
-	        is_bsp_op(parr_idx(ops, 2), OP_EQUAL));
+	        is_bsp_op(parr_idx(ops, 0), ccoin_OP_HASH160) &&
+	        is_bsp_ccoin_OP_pubkeyhash(parr_idx(ops, 1)) &&
+	        is_bsp_op(parr_idx(ops, 2), ccoin_OP_EQUAL));
 }
 
-// OP_SMALLINTEGER, OP_PUBKEYS, OP_SMALLINTEGER, OP_CHECKMULTISIG
+// ccoin_OP_SMALLINTEGER, ccoin_OP_PUBKEYS, ccoin_OP_SMALLINTEGER, ccoin_OP_CHECKMULTISIG
 bool is_bsp_multisig(parr *ops)
 {
 	if ((ops->len < 3) || (ops->len > (16 + 3)) ||
-	    !is_bsp_op_smallint(parr_idx(ops, 0)) ||
-	    !is_bsp_op_smallint(parr_idx(ops, ops->len - 2)) ||
-	    !is_bsp_op(parr_idx(ops, ops->len - 1), OP_CHECKMULTISIG))
+	    !is_bsp_ccoin_OP_smallint(parr_idx(ops, 0)) ||
+	    !is_bsp_ccoin_OP_smallint(parr_idx(ops, ops->len - 2)) ||
+	    !is_bsp_op(parr_idx(ops, ops->len - 1), ccoin_OP_CHECKMULTISIG))
 		return false;
 
 	unsigned int i;
 	for (i = 1; i < (ops->len - 2); i++)
-		if (!is_bsp_op_pubkey(parr_idx(ops, i)))
+		if (!is_bsp_ccoin_OP_pubkey(parr_idx(ops, i)))
 			return false;
 
 	return true;
@@ -242,14 +242,14 @@ void bsp_addr_free(struct bscript_addr *addrs)
 
 void bsp_push_data(cstring *s, const void *data, size_t data_len)
 {
-	if (data_len < OP_PUSHDATA1) {
+	if (data_len < ccoin_OP_PUSHDATA1) {
 		uint8_t c = (uint8_t) data_len;
 
 		cstr_append_buf(s, &c, sizeof(c));
 	}
 
 	else if (data_len <= 0xff) {
-		uint8_t opcode = OP_PUSHDATA1;
+		uint8_t opcode = ccoin_OP_PUSHDATA1;
 		uint8_t v8 = (uint8_t) data_len;
 
 		cstr_append_buf(s, &opcode, sizeof(opcode));
@@ -257,7 +257,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
 	}
 
 	else if (data_len <= 0xffff) {
-		uint8_t opcode = OP_PUSHDATA2;
+		uint8_t opcode = ccoin_OP_PUSHDATA2;
 		uint16_t v16_le = htole16((uint16_t) data_len);
 
 		cstr_append_buf(s, &opcode, sizeof(opcode));
@@ -265,7 +265,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
 	}
 
 	else {
-		uint8_t opcode = OP_PUSHDATA4;
+		uint8_t opcode = ccoin_OP_PUSHDATA4;
 		uint32_t v32_le = htole32((uint32_t) data_len);
 
 		cstr_append_buf(s, &opcode, sizeof(opcode));
@@ -278,7 +278,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
 void bsp_push_int64(cstring *s, int64_t n)
 {
 	if (n == -1 || (n >= 1 && n <= 16)) {
-		unsigned char c = (unsigned char) (n + (OP_1 - 1));
+		unsigned char c = (unsigned char) (n + (ccoin_OP_1 - 1));
 		cstr_append_buf(s, &c, 1);
 		return;
 	}
@@ -312,7 +312,7 @@ void bsp_push_int64(cstring *s, int64_t n)
 void bsp_push_uint64(cstring *s, uint64_t n)
 {
 	if (n >= 1 && n <= 16) {
-		unsigned char c = (unsigned char) (n + (OP_1 - 1));
+		unsigned char c = (unsigned char) (n + (ccoin_OP_1 - 1));
 		cstr_append_buf(s, &c, 1);
 		return;
 	}
@@ -339,9 +339,9 @@ cstring *bsp_make_scripthash(cstring *hash)
 {
 	cstring *script_out = cstr_new_sz(32);
 
-	bsp_push_op(script_out, OP_HASH160);
+	bsp_push_op(script_out, ccoin_OP_HASH160);
 	bsp_push_data(script_out, hash->str, hash->len);
-	bsp_push_op(script_out, OP_EQUAL);
+	bsp_push_op(script_out, ccoin_OP_EQUAL);
 
 	return script_out;
 }
@@ -350,11 +350,11 @@ cstring *bsp_make_pubkeyhash(cstring *hash)
 {
 	cstring *script_out = cstr_new_sz(32);
 
-	bsp_push_op(script_out, OP_DUP);
-	bsp_push_op(script_out, OP_HASH160);
+	bsp_push_op(script_out, ccoin_OP_DUP);
+	bsp_push_op(script_out, ccoin_OP_HASH160);
 	bsp_push_data(script_out, hash->str, hash->len);
-	bsp_push_op(script_out, OP_EQUALVERIFY);
-	bsp_push_op(script_out, OP_CHECKSIG);
+	bsp_push_op(script_out, ccoin_OP_EQUALVERIFY);
+	bsp_push_op(script_out, ccoin_OP_CHECKSIG);
 
 	return script_out;
 }
