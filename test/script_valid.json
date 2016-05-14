@@ -4,9 +4,9 @@
 ["0x4b 0x417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
  "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL", "push 75 bytes"],
 
-["0x4c 0x01 0x07","7 EQUAL", "0x4c is OP_PUSHDATA1"],
-["0x4d 0x0100 0x08","8 EQUAL", "0x4d is OP_PUSHDATA2"],
-["0x4e 0x01000000 0x09","9 EQUAL", "0x4e is OP_PUSHDATA4"],
+["0x4c 0x01 0x07","7 EQUAL", "0x4c is ccoin_OP_PUSHDATA1"],
+["0x4d 0x0100 0x08","8 EQUAL", "0x4d is ccoin_OP_PUSHDATA2"],
+["0x4e 0x01000000 0x09","9 EQUAL", "0x4e is ccoin_OP_PUSHDATA4"],
 
 ["0x4c 0x00","0 EQUAL"],
 ["0x4d 0x0000","0 EQUAL"],
