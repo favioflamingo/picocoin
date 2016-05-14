@@ -3,6 +3,8 @@
 .deps
 autom4te.cache
 
+.*project
+
 *.o
 *.lo
 *.la
