@@ -9,6 +9,10 @@
 
 #include <lax_der_privatekey_parsing.c>
 #include <lax_der_parsing.c>
+#include <openssl/ec.h>
+#include <openssl/ecdsa.h>
+#include <openssl/obj_mac.h>
+#include <openssl/ripemd.h>
 #include <openssl/rand.h>
 #include <string.h>
 
@@ -298,7 +302,7 @@ bool bp_key_add_secret(struct bp_key *out,
 /* for backward compatibility, make sure that we can get an EC Key */
 bool bp_key_init_eckey(EC_KEY *key)
 {
-	memset(key, 0, sizeof(*key));
+	//memset(key, 0, sizeof(EC_KEY));
 
 	key = EC_KEY_new_by_curve_name(NID_secp256k1);
 	if (!key)
@@ -351,7 +355,7 @@ bool bp_key_eckey(EC_KEY* ans, const struct bp_key *key){
 		return false;
 
 	uint8_t 		secret[32];
-	uint8_t		pubkey[60]
+	void *pubkey = NULL;
 	size_t		pk_len;
 	if(bp_key_secret_get(secret, 32, key)){
 		// have secret
