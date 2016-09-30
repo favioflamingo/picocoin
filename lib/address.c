@@ -4,7 +4,7 @@
  */
 #include "picocoin-config.h"
 
-#include <openssl/ripemd.h>
+#include <ccoin/crypto/ripemd160.h>
 #include <ccoin/address.h>
 #include <ccoin/base58.h>
 #include <ccoin/util.h>
@@ -15,7 +15,8 @@ cstring *bp_pubkey_get_address(const struct bp_key *key, unsigned char addrtype)
 	void *pubkey = NULL;
 	size_t pk_len = 0;
 
-	bp_pubkey_get(key, &pubkey, &pk_len);
+	if (!bp_pubkey_get(key, &pubkey, &pk_len))
+		return NULL;
 
 	unsigned char md160[RIPEMD160_DIGEST_LENGTH];
 

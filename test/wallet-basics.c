@@ -99,7 +99,7 @@ static void runtest(const char *json_base_fn, const char *ser_in_fn,
 
 	/* load key that has received an incoming payment */
 	struct bp_key key;
-	assert(bp_key_init(&key) == true);
+	bp_key_init(&key);
 
 	load_json_key(wallet, &key);
 
@@ -165,6 +165,7 @@ int main (int argc, char *argv[])
 	    "bf1938abc33cc0b4cde7d94002412b17e35e3c657689e1be7ff588f3fda8d463");
 
 	ERR_remove_state(0);
+	bp_key_static_shutdown();
 
 	return 0;
 }

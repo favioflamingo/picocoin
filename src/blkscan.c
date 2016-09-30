@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <argp.h>
-#include <openssl/ripemd.h>
+#include <ccoin/crypto/ripemd160.h>
 #include <ccoin/coredefs.h>
 #include <ccoin/base58.h>
 #include <ccoin/buffer.h>
@@ -270,8 +270,8 @@ static void print_txout(bool show_from, unsigned int i, struct bp_txout *txout)
 	printf("\n");
 
 out:
-        clist_free_ext(addrs.pub, buffer_free);
-        clist_free_ext(addrs.pubhash, buffer_free);
+        clist_free_ext(addrs.pub, buffer_freep);
+        clist_free_ext(addrs.pubhash, buffer_freep);
 }
 
 static void print_txouts(struct bp_tx *tx, int idx)
@@ -333,18 +333,21 @@ static void print_txins(struct bp_tx *tx)
 static void index_block(unsigned int height, struct bp_block *block,
 			uint64_t fpos)
 {
-	uint64_t *fpos_copy = malloc(sizeof(uint64_t));
-	*fpos_copy = fpos;
-
 	unsigned int n;
 	for (n = 0; n < block->vtx->len; n++) {
 		struct bp_tx *tx;
+		uint64_t *fpos_copy;
 
 		tx = parr_idx(block->vtx, n);
 
 		bp_tx_calc_sha256(tx);
 
 		bu256_t *hash = bu256_new(&tx->sha256);
+
+		fpos_copy = malloc(sizeof(fpos));
+		if (fpos_copy)
+			*fpos_copy = fpos;
+
 		bp_hashtab_put(tx_idx, hash, fpos_copy);
 	}
 }
@@ -454,7 +457,7 @@ int main (int argc, char *argv[])
 	bpks_init(&bpks);
 
 	tx_idx = bp_hashtab_new_ext(bu256_hash, bu256_equal_,
-				    (bp_freefunc) bu256_free, NULL);
+				    bu256_freep, free);
 
 	load_addresses();
 	scan_blocks();

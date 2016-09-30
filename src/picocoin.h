@@ -5,36 +5,19 @@
  * file COPYING or http://www.opensource.org/licenses/mit-license.php.
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <ccoin/coredefs.h>
-#include <ccoin/buint.h>
-#include <ccoin/core.h>
-#include <ccoin/hashtab.h>
+#include <ccoin/buint.h>                // for bu256_t
+#include <ccoin/hashtab.h>              // for bp_hashtab_get
+
+#include <stdint.h>                     // for uint64_t
 
 struct wallet;
 
-enum {
-	PROTO_VERSION		= 60002,
-};
-
 /* main.c */
 extern struct bp_hashtab *settings;
-extern struct wallet *cur_wallet;
 extern const struct chain_info *chain;
 extern bu256_t chain_genesis;
 extern uint64_t instance_nonce;
-extern bool debugging;
-
-/* net.c */
-extern void network_sync(void);
-
-/* aes.c */
-extern cstring *read_aes_file(const char *filename, void *key, size_t key_len,
-			      size_t max_file_len);
-extern bool write_aes_file(const char *filename, void *key, size_t key_len,
-		    const void *plaintext, size_t pt_len);
+extern struct wallet *cur_wallet;
 
 static inline char *setting(const char *key)
 {

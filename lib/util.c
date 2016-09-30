@@ -13,11 +13,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
-#include <openssl/sha.h>
-#include <openssl/ripemd.h>
 #include <ccoin/coredefs.h>
 #include <ccoin/util.h>
 #include <ccoin/compat.h>		/* for mkstemp */
+#include <ccoin/crypto/sha2.h>
+#include <ccoin/crypto/ripemd160.h>
 
 void bu_reverse_copy(unsigned char *dst, const unsigned char *src, size_t len)
 {
@@ -31,8 +31,8 @@ void bu_Hash(unsigned char *md256, const void *data, size_t data_len)
 {
 	unsigned char md1[SHA256_DIGEST_LENGTH];
 
-	SHA256(data, data_len, md1);
-	SHA256(md1, SHA256_DIGEST_LENGTH, md256);
+	sha256_Raw(data, data_len, md1);
+	sha256_Raw(md1, SHA256_DIGEST_LENGTH, md256);
 }
 
 void bu_Hash_(unsigned char *md256,
@@ -42,12 +42,12 @@ void bu_Hash_(unsigned char *md256,
 	SHA256_CTX ctx;
 	unsigned char md1[SHA256_DIGEST_LENGTH];
 
-	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, data1, data_len1);
-	SHA256_Update(&ctx, data2, data_len2);
-	SHA256_Final(md1, &ctx);
+	sha256_Init(&ctx);
+	sha256_Update(&ctx, data1, data_len1);
+	sha256_Update(&ctx, data2, data_len2);
+	sha256_Final(md1, &ctx);
 
-	SHA256(md1, SHA256_DIGEST_LENGTH, md256);
+	sha256_Raw(md1, SHA256_DIGEST_LENGTH, md256);
 }
 
 void bu_Hash4(unsigned char *md32, const void *data, size_t data_len)
@@ -62,8 +62,8 @@ void bu_Hash160(unsigned char *md160, const void *data, size_t data_len)
 {
 	unsigned char md1[SHA256_DIGEST_LENGTH];
 
-	SHA256(data, data_len, md1);
-	RIPEMD160(md1, SHA256_DIGEST_LENGTH, md160);
+	sha256_Raw(data, data_len, md1);
+	ripemd160(md1, SHA256_DIGEST_LENGTH, md160);
 }
 
 bool bu_read_file(const char *filename, void **data_, size_t *data_len_,
@@ -221,14 +221,17 @@ void btc_decimal(char *valstr, size_t valstr_sz, int64_t val)
 
 unsigned long czstr_hash(const void *p)
 {
-	size_t slen = strlen(p ? p : "");
+	if (!p) p = "";
+	size_t slen = strlen(p);
 	return djb2_hash(0x8088, p, slen);
 }
 
 bool czstr_equal(const void *a, const void *b)
 {
-	size_t a_len = strlen(a ? a : "");
-	size_t b_len = strlen(b ? b : "");
+	if (!a) a = "";
+	if (!b) b = "";
+	size_t a_len = strlen(a);
+	size_t b_len = strlen(b);
 	if (a_len != b_len)
 		return false;
 

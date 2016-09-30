@@ -23,6 +23,13 @@ enum service_bits {
 	NODE_NETWORK	= (1 << 0),
 };
 
+enum {
+	SEQUENCE_FINAL = 0xffffffff,
+	SEQUENCE_LOCKTIME_DISABLE_FLAG = (1 << 31),
+	SEQUENCE_LOCKTIME_TYPE_FLAG = (1 << 22),
+	SEQUENCE_LOCKTIME_MASK = 0x0000ffff,
+};
+
 static inline bool bp_valid_value(int64_t nValue)
 {
 	if (nValue < 0 || nValue > 21000000LL * COIN)
@@ -46,6 +53,7 @@ extern bool deser_bp_addr(unsigned int protover,
 		struct bp_address *addr, struct const_buffer *buf);
 extern void ser_bp_addr(cstring *s, unsigned int protover, const struct bp_address *addr);
 static inline void bp_addr_free(struct bp_address *addr) {}
+extern void bp_addr_freep(void *p);
 
 static inline void bp_addr_copy(struct bp_address *dest,
 				const struct bp_address *src)
@@ -62,6 +70,7 @@ extern void bp_inv_init(struct bp_inv *inv);
 extern bool deser_bp_inv(struct bp_inv *inv, struct const_buffer *buf);
 extern void ser_bp_inv(cstring *s, const struct bp_inv *inv);
 static inline void bp_inv_free(struct bp_inv *inv) {}
+extern void bp_inv_freep(void *bp_inv_p);
 
 struct bp_locator {
 	uint32_t	nVersion;
@@ -115,7 +124,7 @@ extern void bp_txin_init(struct bp_txin *txin);
 extern bool deser_bp_txin(struct bp_txin *txin, struct const_buffer *buf);
 extern void ser_bp_txin(cstring *s, const struct bp_txin *txin);
 extern void bp_txin_free(struct bp_txin *txin);
-extern void bp_txin_free_cb(void *data);
+extern void bp_txin_freep(void *data);
 static inline bool bp_txin_valid(const struct bp_txin *txin) { return true; }
 extern void bp_txin_copy(struct bp_txin *dest, const struct bp_txin *src);
 
@@ -128,7 +137,7 @@ extern void bp_txout_init(struct bp_txout *txout);
 extern bool deser_bp_txout(struct bp_txout *txout, struct const_buffer *buf);
 extern void ser_bp_txout(cstring *s, const struct bp_txout *txout);
 extern void bp_txout_free(struct bp_txout *txout);
-extern void bp_txout_free_cb(void *data);
+extern void bp_txout_freep(void *data);
 extern void bp_txout_set_null(struct bp_txout *txout);
 extern void bp_txout_copy(struct bp_txout *dest, const struct bp_txout *src);
 
@@ -158,6 +167,7 @@ extern bool deser_bp_tx(struct bp_tx *tx, struct const_buffer *buf);
 extern void ser_bp_tx(cstring *s, const struct bp_tx *tx);
 extern void bp_tx_free_vout(struct bp_tx *tx);
 extern void bp_tx_free(struct bp_tx *tx);
+extern void bp_tx_freep(void *bp_tx_p);
 extern bool bp_tx_valid(const struct bp_tx *tx);
 extern void bp_tx_calc_sha256(struct bp_tx *tx);
 extern unsigned int bp_tx_ser_size(const struct bp_tx *tx);
@@ -187,6 +197,7 @@ struct bp_utxo {
 
 extern void bp_utxo_init(struct bp_utxo *coin);
 extern void bp_utxo_free(struct bp_utxo *coin);
+extern void bp_utxo_freep(void *bp_utxo_coin);
 extern bool bp_utxo_from_tx(struct bp_utxo *coin, const struct bp_tx *tx,
 		     bool is_coinbase, unsigned int height);
 
@@ -231,6 +242,7 @@ extern void bp_block_init(struct bp_block *block);
 extern bool deser_bp_block(struct bp_block *block, struct const_buffer *buf);
 extern void ser_bp_block(cstring *s, const struct bp_block *block);
 extern void bp_block_free(struct bp_block *block);
+extern void bp_block_freep(void *bp_block_p);
 extern void bp_block_vtx_free(struct bp_block *block);
 extern void bp_block_calc_sha256(struct bp_block *block);
 extern void bp_block_merkle(bu256_t *vo, const struct bp_block *block);

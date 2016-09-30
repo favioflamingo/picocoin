@@ -4,15 +4,16 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
-#include <openssl/sha.h>
-#include <openssl/ripemd.h>
 #include <ccoin/script.h>
 #include <ccoin/util.h>
 #include <ccoin/key.h>
 #include <ccoin/serialize.h>
 #include <ccoin/compat.h>		/* for parr_new */
+#include <ccoin/crypto/sha1.h>
+#include <ccoin/crypto/sha2.h>
+#include <ccoin/crypto/ripemd160.h>
 
-static const size_t nMaxNumSize = 4;
+static const size_t nDefaultMaxNumSize = 4;
 
 static void string_find_del(cstring *s, const struct buffer *buf)
 {
@@ -60,6 +61,14 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
 		return;
 	}
 
+	// Check for invalid use of SIGHASH_SINGLE
+	if ((nHashType & 0x1f) == SIGHASH_SINGLE) {
+		if (nIn >= txTo->vin->len) {
+			bu256_set_u64(hash, 1);
+			return;
+		}
+	}
+
 	struct bp_tx txTmp;
 	bp_tx_init(&txTmp);
 	bp_tx_copy(&txTmp, txTo);
@@ -82,7 +91,7 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
 	if ((nHashType & 0x1f) == SIGHASH_NONE) {
 		/* Wildcard payee */
 		bp_tx_free_vout(&txTmp);
-		txTmp.vout = parr_new(1, bp_txout_free_cb);
+		txTmp.vout = parr_new(1, bp_txout_freep);
 
 		/* Let the others update at will */
 		for (i = 0; i < txTmp.vin->len; i++) {
@@ -150,11 +159,31 @@ static const unsigned char disabled_op[256] = {
 	[ccoin_OP_RSHIFT] = 1,
 };
 
-static bool CastToBigNum(mpz_t vo, const struct buffer *buf)
+static bool CastToBigNum(mpz_t vo, const struct buffer *buf, bool fRequireMinimal, const size_t nMaxNumSize)
 {
 	if (buf->len > nMaxNumSize)
 		return false;
 
+	const unsigned char *vch = buf->p;
+
+	if (fRequireMinimal && buf->len > 0) {
+		// Check that the number is encoded with the minimum possible
+		// number of bytes.
+		//
+		// If the most-significant-byte - excluding the sign bit - is zero
+		// then we're not minimal. Note how this test also rejects the
+		// negative-zero encoding, 0x80.
+		if ((vch[buf->len - 1] & 0x7f) == 0) {
+			// One exception: if there's more than one byte and the most
+			// significant bit of the second-most-significant-byte is set
+			// it would conflict with the sign bit. An example of this case
+			// is +-255, which encode to 0xff00 and 0xff80 respectively.
+			// (big-endian).
+			if (buf->len <= 1 || (vch[buf->len - 2] & 0x80) == 0) {
+				return false;
+			}
+		}
+	}
 	bn_setvch(vo, buf->p, buf->len);
 
 	return true;
@@ -217,7 +246,7 @@ static struct buffer *stacktop(parr *stack, int index)
 	return stack->data[stack->len + index];
 }
 
-static int stackint(parr *stack, int index)
+static int stackint(parr *stack, int index, bool fRequireMinimal)
 {
 	struct buffer *buf = stacktop(stack, index);
 	mpz_t bn;
@@ -225,7 +254,7 @@ static int stackint(parr *stack, int index)
 
 	int ret = -1;
 
-	if (!CastToBigNum(bn, buf))
+	if (!CastToBigNum(bn, buf, fRequireMinimal, nDefaultMaxNumSize))
 		goto out;
 
 	ret = mpz_get_si(bn);
@@ -306,15 +335,253 @@ out:
 	return rc;
 }
 
-static bool IsCanonicalSignature(const struct buffer *vch)
+bool static IsCompressedOrUncompressedPubKey(const struct buffer *vchPubKey) {
+
+    const unsigned char *pubkey = vchPubKey->p;
+
+    if (vchPubKey->len < 33) {
+		//  Non-canonical public key: too short
+		return false;
+    }
+    if (pubkey[0] == 0x04) {
+		if (vchPubKey->len != 65) {
+			//  Non-canonical public key: invalid length for uncompressed key
+			return false;
+		}
+	} else if (pubkey[0] == 0x02 || pubkey[0] == 0x03) {
+		if (vchPubKey->len != 33) {
+			//  Non-canonical public key: invalid length for compressed key
+			return false;
+		}
+	} else {
+		//  Non-canonical public key: neither compressed nor uncompressed
+		return false;
+    }
+    return true;
+}
+
+static bool IsValidSignatureEncoding(const struct buffer *vch)
 {
-	// TODO
+    // Format: 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S] [sighash]
+    // * total-length: 1-byte length descriptor of everything that follows,
+    //   excluding the sighash byte.
+    // * R-length: 1-byte length descriptor of the R value that follows.
+    // * R: arbitrary-length big-endian encoded R value. It must use the shortest
+    //   possible encoding for a positive integers (which means no null bytes at
+    //   the start, except a single one when the next byte has its highest bit set).
+    // * S-length: 1-byte length descriptor of the S value that follows.
+    // * S: arbitrary-length big-endian encoded S value. The same rules apply.
+    // * sighash: 1-byte value indicating what data is hashed (not part of the DER
+    //   signature)
+
+    const unsigned char *sig = vch->p;
+
+    // Minimum and maximum size constraints.
+    if (vch->len < 9) return false;
+    if (vch->len > 73) return false;
+
+    // A signature is of type 0x30 (compound).
+    if (sig[0] != 0x30) return false;
+
+    // Make sure the length covers the entire signature.
+    if (sig[1] != vch->len - 3) return false;
+
+    // Extract the length of the R element.
+    unsigned int lenR = sig[3];
+
+    // Make sure the length of the S element is still inside the signature.
+    if (5 + lenR >= vch->len) return false;
+
+    // Extract the length of the S element.
+    unsigned int lenS = sig[5 + lenR];
+
+    // Verify that the length of the signature matches the sum of the length
+    // of the elements.
+    if ((size_t)(lenR + lenS + 7) != vch->len) return false;
+
+    // Check whether the R element is an integer.
+    if (sig[2] != 0x02) return false;
+
+    // Zero-length integers are not allowed for R.
+    if (lenR == 0) return false;
+
+    // Negative numbers are not allowed for R.
+    if (sig[4] & 0x80) return false;
+
+    // Null bytes at the start of R are not allowed, unless R would
+    // otherwise be interpreted as a negative number.
+    if (lenR > 1 && (sig[4] == 0x00) && !(sig[5] & 0x80)) return false;
+
+    // Check whether the S element is an integer.
+    if (sig[lenR + 4] != 0x02) return false;
+
+    // Zero-length integers are not allowed for S.
+    if (lenS == 0) return false;
+
+    // Negative numbers are not allowed for S.
+    if (sig[lenR + 6] & 0x80) return false;
+
+    // Null bytes at the start of S are not allowed, unless S would otherwise be
+    // interpreted as a negative number.
+    if (lenS > 1 && (sig[lenR + 6] == 0x00) && !(sig[lenR + 7] & 0x80)) return false;
+
+    return true;
+}
+
+static bool IsLowDERSignature(const struct buffer *vchSig) {
+    if (!IsValidSignatureEncoding(vchSig)) return false;
+
+    if (!bp_pubkey_checklowS(vchSig->p, vchSig->len)) return false;
+
+    return true;
+}
+
+bool static IsDefinedHashtypeSignature(const struct buffer *vchSig) {
+	if (vchSig->len == 0)
+		return false;
+
+	const unsigned char *sig = vchSig->p;
+
+    unsigned char nHashType = sig[vchSig->len - 1] & (~(SIGHASH_ANYONECANPAY));
+
+    if (nHashType < SIGHASH_ALL || nHashType > SIGHASH_SINGLE)
+        return false;
+
+    return true;
+}
+
+static bool CheckSignatureEncoding(const struct buffer *vchSig, unsigned int flags) {
+    // Empty signature. Not strictly DER encoded, but allowed to provide a
+    // compact way to provide an invalid signature for use with CHECK(MULTI)SIG
+    if (vchSig->len == 0)
+        return true;
+
+	if ((flags & (SCRIPT_VERIFY_DERSIG | SCRIPT_VERIFY_LOW_S | SCRIPT_VERIFY_STRICTENC)) != 0 && !IsValidSignatureEncoding(vchSig))
+		return false;
+    else if ((flags & SCRIPT_VERIFY_LOW_S) != 0 && !IsLowDERSignature(vchSig))
+		return false;
+	else if ((flags & SCRIPT_VERIFY_STRICTENC) != 0 && !IsDefinedHashtypeSignature(vchSig))
+
+        return false;
+    return true;
+}
+
+static bool CheckPubKeyEncoding(const struct buffer *vchPubKey, unsigned int flags) {
+    if ((flags & SCRIPT_VERIFY_STRICTENC) != 0 && !IsCompressedOrUncompressedPubKey(vchPubKey))
+        return false;
+
+    return true;
+}
+
+bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode) {
+
+	const unsigned char *vch = data->p;
+
+	if (data->len == 0) {
+		// Could have used OP_0.
+		return opcode == OP_0;
+	} else if (data->len == 1 && vch[0] >= 1 && vch[0] <= 16) {
+		// Could have used OP_1 .. OP_16.
+		return opcode == OP_1 + (vch[0] - 1);
+	} else if (data->len == 1 && vch[0] == 0x81) {
+		// Could have used OP_1NEGATE.
+		return opcode == OP_1NEGATE;
+	} else if (data->len <= 75) {
+		// Could have used a direct push (opcode indicating number of bytes pushed + those bytes).
+		return opcode == data->len;
+	} else if (data->len <= 255) {
+		// Could have used OP_PUSHDATA.
+		return opcode == OP_PUSHDATA1;
+	} else if (data->len <= 65535) {
+		// Could have used OP_PUSHDATA2.
+		return opcode == OP_PUSHDATA2;
+	}
+    return true;
+}
+
+bool CheckLockTime(const unsigned int nLockTime, const struct bp_tx *txTo, unsigned int nIn)
+{
+	// There are two kinds of nLockTime: lock-by-blockheight
+	// and lock-by-blocktime, distinguished by whether
+	// nLockTime < LOCKTIME_THRESHOLD.
+	//
+	// We want to compare apples to apples, so fail the script
+	// unless the type of nLockTime being tested is the same as
+	// the nLockTime in the transaction.
+	if (!(
+		(txTo->nLockTime <  LOCKTIME_THRESHOLD && nLockTime <  LOCKTIME_THRESHOLD) ||
+		(txTo->nLockTime >= LOCKTIME_THRESHOLD && nLockTime >= LOCKTIME_THRESHOLD)
+	))
+		return false;
+
+	// Now that we know we're comparing apples-to-apples, the
+	// comparison is a simple numeric one.
+	if (nLockTime > (int64_t)txTo->nLockTime)
+		return false;
+
+	// Finally the nLockTime feature can be disabled and thus
+	// CHECKLOCKTIMEVERIFY bypassed if every txin has been
+	// finalized by setting nSequence to maxint. The
+	// transaction would be allowed into the blockchain, making
+	// the opcode ineffective.
+	//
+	// Testing if this vin is not final is sufficient to
+	// prevent this condition. Alternatively we could test all
+	// inputs, but testing just this input minimizes the data
+	// required to prove correct CHECKLOCKTIMEVERIFY execution.
+	struct bp_txin *txin = parr_idx(txTo->vin, nIn);
+
+	if (SEQUENCE_FINAL == txin->nSequence)
+		return false;
+
 	return true;
 }
 
-static bool IsCanonicalPubKey(const struct buffer *vch)
+bool CheckSequence(const unsigned int nSequence, const struct bp_tx *txTo, unsigned int nIn)
 {
-	// TODO
+	const struct bp_txin *txin = parr_idx(txTo->vin, nIn);
+
+	// Relative lock times are supported by comparing the passed
+	// in operand to the sequence number of the input.
+	const int64_t txToSequence = (int64_t)txin->nSequence;
+
+	// Fail if the transaction's version number is not set high
+	// enough to trigger BIP 68 rules.
+	if (txTo->nVersion < 2)
+		return false;
+
+	// Sequence numbers with their most significant bit set are not
+	// consensus constrained. Testing that the transaction's sequence
+	// number do not have this bit set prevents using this property
+	// to get around a CHECKSEQUENCEVERIFY check.
+	if (txToSequence & SEQUENCE_LOCKTIME_DISABLE_FLAG)
+		return false;
+
+	// Mask off any bits that do not have consensus-enforced meaning
+	// before doing the integer comparisons
+	const uint32_t nLockTimeMask = SEQUENCE_LOCKTIME_TYPE_FLAG | SEQUENCE_LOCKTIME_MASK;
+	const int64_t txToSequenceMasked = txToSequence & nLockTimeMask;
+	const uint64_t nSequenceMasked = nSequence & nLockTimeMask;
+
+	// There are two kinds of nSequence: lock-by-blockheight
+	// and lock-by-blocktime, distinguished by whether
+	// nSequenceMasked < CTxIn::SEQUENCE_LOCKTIME_TYPE_FLAG.
+	//
+	// We want to compare apples to apples, so fail the script
+	// unless the type of nSequenceMasked being tested is the same as
+	// the nSequenceMasked in the transaction.
+	if (!(
+		(txToSequenceMasked <  SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked <  SEQUENCE_LOCKTIME_TYPE_FLAG) ||
+		(txToSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG && nSequenceMasked >= SEQUENCE_LOCKTIME_TYPE_FLAG)
+	)) {
+		return false;
+	}
+
+	// Now that we know we're comparing apples-to-apples, the
+	// comparison is a simple numeric one.
+	if (nSequenceMasked > txToSequenceMasked)
+		return false;
+
 	return true;
 }
 
@@ -328,15 +595,15 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 	struct bscript_op op;
 	bool rc = false;
 	cstring *vfExec = cstr_new(NULL);
-	parr *altstack = parr_new(0, buffer_free);
+	parr *altstack = parr_new(0, buffer_freep);
 	mpz_t bn;
 	mpz_init(bn);
 
-	if (script->len > 10000)
+	if (script->len > MAX_SCRIPT_SIZE)
 		goto out;
 
-	bool fStrictEncodings = flags & SCRIPT_VERIFY_STRICTENC;
 	unsigned int nOpCount = 0;
+	bool fRequireMinimal = (flags & SCRIPT_VERIFY_MINIMALDATA) != 0;
 
 	struct bscript_parser bp;
 	bsp_start(&bp, &pc);
@@ -348,16 +615,26 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			goto out;
 		enum opcodetype opcode = op.op;
 
-		if (op.data.len > 520)
+		if (op.data.len > MAX_SCRIPT_ELEMENT_SIZE)
 			goto out;
+<<<<<<< HEAD
 		if (opcode > ccoin_OP_16 && ++nOpCount > 201)
+=======
+		if (opcode > OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
+>>>>>>> jgarzik/master
 			goto out;
 		if (disabled_op[opcode])
 			goto out;
 
-		if (fExec && is_bsp_pushdata(opcode))
+		if (fExec && is_bsp_pushdata(opcode)) {
+			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
+				goto out;
 			stack_push(stack, (struct buffer *) &op.data);
+<<<<<<< HEAD
 		else if (fExec || (ccoin_OP_IF <= opcode && opcode <= ccoin_OP_ENDIF))
+=======
+		} else if (fExec || (OP_IF <= opcode && opcode <= OP_ENDIF))
+>>>>>>> jgarzik/master
 		switch (opcode) {
 
 		//
@@ -387,9 +664,102 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 		//
 		// Control
 		//
+<<<<<<< HEAD
 		case ccoin_OP_NOP:
 		case ccoin_OP_NOP1: case ccoin_OP_NOP2: case ccoin_OP_NOP3: case ccoin_OP_NOP4: case ccoin_OP_NOP5:
 		case ccoin_OP_NOP6: case ccoin_OP_NOP7: case ccoin_OP_NOP8: case ccoin_OP_NOP9: case ccoin_OP_NOP10:
+=======
+		case OP_NOP:
+			break;
+
+		case OP_CHECKLOCKTIMEVERIFY: {
+			if (!(flags & SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY)) {
+				// not enabled; treat as a NOP2
+				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
+					goto out;
+				break;
+			}
+
+			if (stack->len < 1)
+				goto out;
+
+			// Note that elsewhere numeric opcodes are limited to
+			// operands in the range -2**31+1 to 2**31-1, however it is
+			// legal for opcodes to produce results exceeding that
+			// range. This limitation is implemented by CastToBigNum's
+			// default 4-byte limit.
+			//
+			// If we kept to that limit we'd have a year 2038 problem,
+			// even though the nLockTime field in transactions
+			// themselves is uint32 which only becomes meaningless
+			// after the year 2106.
+			//
+			// Thus as a special case we tell CastToBigNum to accept up
+			// to 5-byte bignums, which are good until 2**39-1, well
+			// beyond the 2**32-1 limit of the nLockTime field itself.
+
+			if (!CastToBigNum(bn, stacktop(stack, -1), fRequireMinimal, 5))
+				goto out;
+
+			// In the rare event that the argument may be < 0 due to
+			// some arithmetic being done first, you can always use
+			// 0 MAX CHECKLOCKTIMEVERIFY.
+			if (mpz_sgn(bn) < 0)
+				goto out;
+
+			uint64_t nLockTime = mpz_get_ui(bn);
+
+			// Actually compare the specified lock time with the transaction.
+			if (!CheckLockTime(nLockTime, txTo, nIn))
+				goto out;
+
+			break;
+		}
+
+		case OP_CHECKSEQUENCEVERIFY:
+		{
+			if (!(flags & SCRIPT_VERIFY_CHECKSEQUENCEVERIFY)) {
+				// not enabled; treat as a NOP3
+				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
+					goto out;
+				break;
+			}
+
+			if (stack->len < 1)
+				goto out;
+
+			// nSequence, like nLockTime, is a 32-bit unsigned integer
+			// field. See the comment in CHECKLOCKTIMEVERIFY regarding
+			// 5-byte numeric operands.
+			if (!CastToBigNum(bn, stacktop(stack, -1), fRequireMinimal, 5))
+				goto out;
+
+			// In the rare event that the argument may be < 0 due to
+			// some arithmetic being done first, you can always use
+			// 0 MAX CHECKSEQUENCEVERIFY.
+			if (mpz_sgn(bn) < 0)
+				goto out;
+
+			uint64_t nSequence = mpz_get_ui(bn);
+
+			// To provide for future soft-fork extensibility, if the
+			// operand has the disabled lock-time flag set,
+			// CHECKSEQUENCEVERIFY behaves as a NOP.
+			if ((nSequence & SEQUENCE_LOCKTIME_DISABLE_FLAG) != 0)
+				break;
+
+			// Compare the specified sequence number with the input.
+			if (!CheckSequence(nSequence, txTo, nIn))
+				goto out;
+
+			break;
+		}
+
+		case OP_NOP1: case OP_NOP4: case OP_NOP5:
+		case OP_NOP6: case OP_NOP7: case OP_NOP8: case OP_NOP9: case OP_NOP10:
+			if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
+				goto out;
+>>>>>>> jgarzik/master
 			break;
 
 		case ccoin_OP_IF:
@@ -572,7 +942,8 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			// (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
 			if (stack->len < 2)
 				goto out;
-			int n = stackint(stack, -1);
+
+			int n = stackint(stack, -1, fRequireMinimal);
 			popstack(stack);
 			if (n < 0 || n >= (int)stack->len)
 				goto out;
@@ -663,7 +1034,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			// (in -- out)
 			if (stack->len < 1)
 				goto out;
-			if (!CastToBigNum(bn, stacktop(stack, -1)))
+			if (!CastToBigNum(bn, stacktop(stack, -1), fRequireMinimal, nDefaultMaxNumSize))
 				goto out;
 			switch (opcode)
 			{
@@ -714,8 +1085,8 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			mpz_t bn1, bn2;
 			mpz_init(bn1);
 			mpz_init(bn2);
-			if (!CastToBigNum(bn1, stacktop(stack, -2)) ||
-			    !CastToBigNum(bn2, stacktop(stack, -1))) {
+			if (!CastToBigNum(bn1, stacktop(stack, -2), fRequireMinimal, nDefaultMaxNumSize) ||
+			    !CastToBigNum(bn2, stacktop(stack, -1), fRequireMinimal, nDefaultMaxNumSize)) {
 				mpz_clear(bn1);
 				mpz_clear(bn2);
 				goto out;
@@ -804,9 +1175,9 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			mpz_init(bn1);
 			mpz_init(bn2);
 			mpz_init(bn3);
-			bool rc1 = CastToBigNum(bn1, stacktop(stack, -3));
-			bool rc2 = CastToBigNum(bn2, stacktop(stack, -2));
-			bool rc3 = CastToBigNum(bn3, stacktop(stack, -1));
+			bool rc1 = CastToBigNum(bn1, stacktop(stack, -3), fRequireMinimal, nDefaultMaxNumSize);
+			bool rc2 = CastToBigNum(bn2, stacktop(stack, -2), fRequireMinimal, nDefaultMaxNumSize);
+			bool rc3 = CastToBigNum(bn3, stacktop(stack, -1), fRequireMinimal, nDefaultMaxNumSize);
 			bool fValue = (mpz_cmp(bn2, bn1) <= 0 &&
 				       mpz_cmp(bn1, bn3) < 0);
 			popstack(stack);
@@ -839,15 +1210,15 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			switch (opcode) {
 			case ccoin_OP_RIPEMD160:
 				hashlen = 20;
-				RIPEMD160(vch->p, vch->len, md);
+				ripemd160(vch->p, vch->len, md);
 				break;
 			case ccoin_OP_SHA1:
 				hashlen = 20;
-				SHA1(vch->p, vch->len, md);
+				sha1_Raw(vch->p, vch->len, md);
 				break;
 			case ccoin_OP_SHA256:
 				hashlen = 32;
-				SHA256(vch->p, vch->len, md);
+				sha256_Raw(vch->p, vch->len, md);
 				break;
 			case ccoin_OP_HASH160:
 				hashlen = 20;
@@ -896,12 +1267,12 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			// a signature to sign itself
 			string_find_del(scriptCode, vchSig);
 
-			bool fSuccess =
-				(!fStrictEncodings ||
-				 (IsCanonicalSignature(vchSig) &&
-				  IsCanonicalPubKey(vchPubKey)));
-			if (fSuccess)
-				fSuccess = bp_checksig(vchSig, vchPubKey,
+			if (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey, flags)) {
+				cstr_free(scriptCode, true);
+				goto out;
+			}
+
+			bool fSuccess = bp_checksig(vchSig, vchPubKey,
 						       scriptCode,
 						       txTo, nIn, nHashType);
 
@@ -928,18 +1299,18 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			if ((int)stack->len < i)
 				goto out;
 
-			int nKeysCount = stackint(stack, -i);
-			if (nKeysCount < 0 || nKeysCount > 20)
+			int nKeysCount = stackint(stack, -i, fRequireMinimal);
+			if (nKeysCount < 0 || nKeysCount > MAX_PUBKEYS_PER_MULTISIG)
 				goto out;
 			nOpCount += nKeysCount;
-			if (nOpCount > 201)
+			if (nOpCount > MAX_OPS_PER_SCRIPT)
 				goto out;
 			int ikey = ++i;
 			i += nKeysCount;
 			if ((int)stack->len < i)
 				goto out;
 
-			int nSigsCount = stackint(stack, -i);
+			int nSigsCount = stackint(stack, -i, fRequireMinimal);
 			if (nSigsCount < 0 || nSigsCount > nKeysCount)
 				goto out;
 			int isig = ++i;
@@ -968,13 +1339,16 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 				struct buffer *vchSig	= stacktop(stack, -isig);
 				struct buffer *vchPubKey = stacktop(stack, -ikey);
 
+				// Note how this makes the exact order of pubkey/signature evaluation
+				// distinguishable by CHECKMULTISIG NOT if the STRICTENC flag is set.
+				// See the script_(in)valid tests for details.
+				if (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey, flags)) {
+					cstr_free(scriptCode, true);
+					goto out;
+				}
+
 				// Check signature
-				bool fOk =
-					(!fStrictEncodings ||
-					 (IsCanonicalSignature(vchSig) &&
-					  IsCanonicalPubKey(vchPubKey)));
-				if (fOk)
-					fOk = bp_checksig(vchSig, vchPubKey,
+				bool fOk = bp_checksig(vchSig, vchPubKey,
 							  scriptCode, txTo, nIn,
 							  nHashType);
 
@@ -993,8 +1367,22 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 
 			cstr_free(scriptCode, true);
 
-			while (i-- > 0)
+			// Clean up stack of actual arguments
+			while (i-- > 1)
 				popstack(stack);
+
+			// A bug causes CHECKMULTISIG to consume one extra argument
+			// whose contents were not checked in any way.
+			//
+			// Unfortunately this is a potential source of mutability,
+			// so optionally verify it is exactly equal to zero prior
+			// to removing it from the stack.
+			if ((int)stack->len < 1)
+				goto out;
+			if ((flags & SCRIPT_VERIFY_NULLDUMMY) && stacktop(stack, -1)->len)
+				goto out;
+			popstack(stack);
+
 			stack_push_char(stack, fSuccess ? 1 : 0);
 
 			if (opcode == ccoin_OP_CHECKMULTISIGVERIFY)
@@ -1029,14 +1417,18 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		      unsigned int flags, int nHashType)
 {
 	bool rc = false;
-	parr *stack = parr_new(0, buffer_free);
+	parr *stack = parr_new(0, buffer_freep);
 	parr *stackCopy = NULL;
+
+	struct const_buffer sigbuf = { scriptSig->str, scriptSig->len };
+	if ((flags & SCRIPT_VERIFY_SIGPUSHONLY) != 0 && !is_bsp_pushonly(&sigbuf))
+		goto out;
 
 	if (!bp_script_eval(stack, scriptSig, txTo, nIn, flags, nHashType))
 		goto out;
 
 	if (flags & SCRIPT_VERIFY_P2SH) {
-		stackCopy = parr_new(stack->len, buffer_free);
+		stackCopy = parr_new(stack->len, buffer_freep);
 		stack_copy(stackCopy, stack);
 	}
 
@@ -1049,7 +1441,6 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		goto out;
 
 	if ((flags & SCRIPT_VERIFY_P2SH) && is_bsp_p2sh_str(scriptPubKey)) {
-		struct const_buffer sigbuf = { scriptSig->str, scriptSig->len };
 		if (!is_bsp_pushonly(&sigbuf))
 			goto out;
 		if (stackCopy->len < 1)
@@ -1058,10 +1449,9 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		struct buffer *pubkey2_buf = stack_take(stackCopy, -1);
 		popstack(stackCopy);
 
-		cstring *pubkey2 = cstr_new_sz(pubkey2_buf->len);
-		cstr_append_buf(pubkey2, pubkey2_buf->p, pubkey2_buf->len);
+		cstring *pubkey2 = cstr_new_buf(pubkey2_buf->p, pubkey2_buf->len);
 
-		buffer_free(pubkey2_buf);
+		buffer_freep(pubkey2_buf);
 
 		bool rc2 = bp_script_eval(stackCopy, pubkey2, txTo, nIn,
 					  flags, nHashType);
@@ -1072,6 +1462,16 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		if (stackCopy->len == 0)
 			goto out;
 		if (CastToBool(stacktop(stackCopy, -1)) == false)
+			goto out;
+	}
+	// The CLEANSTACK check is only performed after potential P2SH evaluation,
+	// as the non-P2SH evaluation of a P2SH script will obviously not result in
+	// a clean stack (the P2SH inputs remain).
+	if ((flags & SCRIPT_VERIFY_CLEANSTACK) != 0) {
+		// Disallow CLEANSTACK without P2SH, as otherwise a switch CLEANSTACK->P2SH+CLEANSTACK
+		// would be possible, which is not a softfork (and P2SH should be one).
+		assert((flags & SCRIPT_VERIFY_P2SH) != 0);
+		if (stack->len != 1)
 			goto out;
 	}
 

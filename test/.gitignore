@@ -1,6 +1,7 @@
 
 libtest.a
 
+aes-util
 base58
 block
 blockfile
@@ -9,12 +10,20 @@ blkdb
 chain-verf
 clist
 cstr
+ctaes
+coredefs
+crypto
 fileio
+hash
 hashtab
 hdkeys
 hex
 keyset
+keystore
+mbr
 message
+misc
+net
 parr
 script
 script-parse
@@ -26,4 +35,4 @@ wallet-basics
 
 *.trs
 *.log
-
+aes_util.dat

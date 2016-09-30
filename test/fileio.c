@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <assert.h>
-#include <openssl/sha.h>
 
+#include <ccoin/crypto/sha1.h>
 #include <ccoin/util.h>
 #include <ccoin/hexcode.h>
 
@@ -30,22 +31,51 @@ static void test_read(const char *filename)
 	assert(data != NULL);
 	assert(data_len == 8193);
 
-	unsigned char md[SHA_DIGEST_LENGTH];
-	SHA1(data, data_len, md);
+	unsigned char md[SHA1_DIGEST_LENGTH];
+	sha1_Raw(data, data_len, md);
 
-	char hexstr[(SHA_DIGEST_LENGTH * 2) + 1];
-	encode_hex(hexstr, md, SHA_DIGEST_LENGTH);
+	char hexstr[(SHA1_DIGEST_LENGTH * 2) + 1];
+	encode_hex(hexstr, md, SHA1_DIGEST_LENGTH);
 
 	assert(strcmp(hexstr, RANDOM_DATA_SHA1SUM) == 0);
+}
+
+static void test_write(const char *filename)
+{
+	bool rc = bu_write_file(filename, data, data_len);
+	assert(rc == true);
+
+	void *data2 = NULL;
+	size_t data2_len = 0;
+	rc = bu_read_file(filename, &data2, &data2_len, 100 * 1024 * 1024);
+	assert(rc == true);
+	assert(data_len == data2_len);
+	assert(memcmp(data, data2, data2_len) == 0);
+
+	int rcv = unlink(filename);
+	assert(rcv == 0);
+
+	free(data2);
+}
+
+static void test_misc(void)
+{
+	int rcv = file_seq_open("does-not-exist");
+	assert(rcv < 0);
 }
 
 int main (int argc, char *argv[])
 {
 	char *filename = test_filename("random.data");
+	const char *w_filename = "fileio.out";
 
 	test_read(filename);
+	test_write(w_filename);
+	test_misc();
 
 	free(filename);
+
+	free(data);
 
 	return 0;
 }

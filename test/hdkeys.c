@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <ccoin/base58.h>
+#include <ccoin/util.h>
 #include <openssl/err.h>
 
 #define MAIN_PUBLIC 0x1EB28804
@@ -110,7 +111,8 @@ static void print_ek_public(const struct hd_extended_key *ek)
 
 	void *pub;
 	size_t pub_len = 0;
-	bp_pubkey_get(&ek->key, &pub, &pub_len);
+	bool rc = bp_pubkey_get(&ek->key, &pub, &pub_len);
+	assert(rc == true);
 	printf(" pub key   : ");
 	print_n(pub, pub_len); NEWLINE;
 	free(pub);
@@ -219,7 +221,7 @@ static void test_extended_key()
 	// Check we get sensible results when parsing some test vector data
 
 	struct hd_extended_key pub;
-	assert(hd_extended_key_init(&pub));
+	hd_extended_key_init(&pub);
 	{
 		cstring *tv1data = base58_decode(s_tv1_m_xpub);
 		assert(hd_extended_key_deser(&pub, tv1data->str, tv1data->len));
@@ -227,7 +229,7 @@ static void test_extended_key()
 	}
 
 	struct hd_extended_key priv;
-	assert(hd_extended_key_init(&priv));
+	hd_extended_key_init(&priv);
 	{
 		cstring *tv1data = base58_decode(s_tv1_m_xprv);
 		assert(hd_extended_key_deser(&priv, tv1data->str, tv1data->len));
@@ -259,7 +261,7 @@ static void test_serialize()
 	struct hd_extended_key_serialized m_xprv;
 
 	{
-		assert(hd_extended_key_init(&m));
+		hd_extended_key_init(&m);
 		assert(hd_extended_key_generate_master(&m, seed, sizeof(seed)));
 		assert(0 == m.depth);
 		assert(0 == m.index);
@@ -303,12 +305,12 @@ static void test_serialize()
 	struct hd_extended_key_serialized m_2H_xprv;
 
 	{
-		assert(hd_extended_key_init(&m_1));
+		hd_extended_key_init(&m_1);
 		assert(hd_extended_key_generate_child(&m, 1, &m_1));
 		assert(write_ek_ser_pub(&m_1_xpub, &m_1));
 		assert(write_ek_ser_prv(&m_1_xprv, &m_1));
 
-		assert(hd_extended_key_init(&m_2H));
+		hd_extended_key_init(&m_2H);
 		assert(hd_extended_key_generate_child(&m, 0x80000002, &m_2H));
 		assert(write_ek_ser_pub(&m_2H_xpub, &m_2H));
 		assert(write_ek_ser_prv(&m_2H_xprv, &m_2H));
@@ -320,7 +322,7 @@ static void test_serialize()
 		struct hd_extended_key m_1_;
 		struct hd_extended_key_serialized m_1_xpub_;
 		struct hd_extended_key_serialized m_1_xprv_;
-		assert(hd_extended_key_init(&m_1_));
+		hd_extended_key_init(&m_1_);
 		assert(hd_extended_key_deser(&m_1_, m_1_xprv.data, sizeof(m_1_xprv)));
 		assert(write_ek_ser_pub(&m_1_xpub_, &m_1_));
 		assert(write_ek_ser_prv(&m_1_xprv_, &m_1_));
@@ -335,7 +337,7 @@ static void test_serialize()
 		struct hd_extended_key m_2H_;
 		struct hd_extended_key_serialized m_2H_xpub_;
 		struct hd_extended_key_serialized m_2H_xprv_;
-		assert(hd_extended_key_init(&m_2H_));
+		hd_extended_key_init(&m_2H_);
 		assert(hd_extended_key_deser(&m_2H_, m_2H_xprv.data, sizeof(m_2H_xprv)));
 		assert(write_ek_ser_pub(&m_2H_xpub_, &m_2H_));
 		assert(write_ek_ser_prv(&m_2H_xprv_, &m_2H_));
@@ -353,14 +355,14 @@ static void test_serialize()
 		struct hd_extended_key m_1_;
 		struct hd_extended_key m_2H_;
 
-		assert(hd_extended_key_init(&m_));
+		hd_extended_key_init(&m_);
 		assert(hd_extended_key_deser(&m_, m_xprv.data, sizeof(m_xprv)));
 
-		assert(hd_extended_key_init(&m_1_));
+		hd_extended_key_init(&m_1_);
 		assert(hd_extended_key_generate_child(&m_, 1, &m_1_));
 		assert(check_keys_match(&m_1, &m_1_));
 
-		assert(hd_extended_key_init(&m_2H_));
+		hd_extended_key_init(&m_2H_);
 		assert(hd_extended_key_generate_child(&m_, 0x80000002, &m_2H_));
 		assert(check_keys_match(&m_2H, &m_2H_));
 
@@ -377,11 +379,11 @@ static void test_serialize()
 		struct hd_extended_key m_1_;
 		uint8_t priv[32];
 
-		assert(hd_extended_key_init(&m_));
+		hd_extended_key_init(&m_);
 		assert(hd_extended_key_deser(&m_, m_xpub.data, sizeof(m_xpub)));
 		assert(!bp_key_secret_get(&priv[0], sizeof(priv), &m_.key));
 
-		assert(hd_extended_key_init(&m_1_));
+		hd_extended_key_init(&m_1_);
 		assert(hd_extended_key_generate_child(&m_, 1, &m_1_));
 		assert(!bp_key_secret_get(&priv[0], sizeof(priv), &m_1_.key));
 
@@ -397,10 +399,10 @@ static void test_serialize()
 	{
 		struct hd_extended_key m_2H_;
 		struct hd_extended_key m_2H_3H_;
-		assert(hd_extended_key_init(&m_2H_));
+		hd_extended_key_init(&m_2H_);
 		assert(hd_extended_key_deser(&m_2H_, m_2H_xpub.data, sizeof(m_2H_xpub)));
 
-		assert(hd_extended_key_init(&m_2H_3H_));
+		hd_extended_key_init(&m_2H_3H_);
 		assert(!hd_extended_key_generate_child(&m_2H_, 0x80000003, &m_2H_));
 
 		hd_extended_key_free(&m_2H_3H_);
@@ -446,7 +448,7 @@ static void test_vector_1()
 	// Chain m
 
 	struct hd_extended_key m;
-	assert(hd_extended_key_init(&m));
+	hd_extended_key_init(&m);
 	assert(hd_extended_key_generate_master(&m, s_tv1_seed,
 					       sizeof(s_tv1_seed)));
 	assert(compare_serialized_pub(&m, &tv1_m_xpub));
@@ -455,7 +457,7 @@ static void test_vector_1()
 	// Chain m/0H
 
 	struct hd_extended_key m_0H;
-	assert(hd_extended_key_init(&m_0H));
+	hd_extended_key_init(&m_0H);
 	assert(hd_extended_key_generate_child(&m, 0x80000000, &m_0H));
 	assert(compare_serialized_pub(&m_0H, &tv1_m_0H_xpub));
 	assert(compare_serialized_prv(&m_0H, &tv1_m_0H_xprv));
@@ -463,7 +465,7 @@ static void test_vector_1()
 	// Chain m/0H/1
 
 	struct hd_extended_key m_0H_1;
-	assert(hd_extended_key_init(&m_0H_1));
+	hd_extended_key_init(&m_0H_1);
 	assert(hd_extended_key_generate_child(&m_0H, 0x00000001, &m_0H_1));
 	assert(compare_serialized_pub(&m_0H_1, &tv1_m_0H_1_xpub));
 	assert(compare_serialized_prv(&m_0H_1, &tv1_m_0H_1_xprv));
@@ -471,7 +473,7 @@ static void test_vector_1()
 	// Chain m/0H/1/2H
 
 	struct hd_extended_key m_0H_1_2H;
-	assert(hd_extended_key_init(&m_0H_1_2H));
+	hd_extended_key_init(&m_0H_1_2H);
 	assert(hd_extended_key_generate_child(&m_0H_1, 0x80000002, &m_0H_1_2H));
 	assert(compare_serialized_pub(&m_0H_1_2H, &tv1_m_0H_1_2H_xpub));
 	assert(compare_serialized_prv(&m_0H_1_2H, &tv1_m_0H_1_2H_xprv));
@@ -479,7 +481,7 @@ static void test_vector_1()
 	// Chain m/0H/1/2H/2
 
 	struct hd_extended_key m_0H_1_2H_2;
-	assert(hd_extended_key_init(&m_0H_1_2H_2));
+	hd_extended_key_init(&m_0H_1_2H_2);
 	assert(hd_extended_key_generate_child(&m_0H_1_2H, 0x00000002,
 					      &m_0H_1_2H_2));
 	assert(compare_serialized_pub(&m_0H_1_2H_2, &tv1_m_0H_1_2H_2_xpub));
@@ -488,12 +490,28 @@ static void test_vector_1()
 	// Chain m/0H/1/2H/2/1000000000
 
 	struct hd_extended_key m_0H_1_2H_2_1000000000;
-	assert(hd_extended_key_init(&m_0H_1_2H_2_1000000000));
+	hd_extended_key_init(&m_0H_1_2H_2_1000000000);
 	assert(hd_extended_key_generate_child(&m_0H_1_2H_2, 1000000000,
 					      &m_0H_1_2H_2_1000000000));
 	assert(compare_serialized_pub(&m_0H_1_2H_2_1000000000,
 				      &tv1_m_0H_1_2H_2_1000000000_xpub));
 	assert(compare_serialized_prv(&m_0H_1_2H_2_1000000000,
+				      &tv1_m_0H_1_2H_2_1000000000_xprv));
+
+	// Chain m/0H/1/2H/2/1000000000, via hd_derive()
+	struct hd_path_seg hdpath[] = {
+		{ 0, true },
+		{ 1, false },
+		{ 2, true },
+		{ 2, false },
+		{ 1000000000, false },
+	};
+	struct hd_extended_key hd_derive_test;
+	hd_extended_key_init(&hd_derive_test);
+	assert(hd_derive(&hd_derive_test, &m, hdpath, ARRAY_SIZE(hdpath)));
+	assert(compare_serialized_pub(&hd_derive_test,
+				      &tv1_m_0H_1_2H_2_1000000000_xpub));
+	assert(compare_serialized_prv(&hd_derive_test,
 				      &tv1_m_0H_1_2H_2_1000000000_xprv));
 
 	hd_extended_key_free(&m_0H_1_2H_2_1000000000);
@@ -548,7 +566,7 @@ static void test_vector_2()
 	// Chain m
 
 	struct hd_extended_key m;
-	assert(hd_extended_key_init(&m));
+	hd_extended_key_init(&m);
 	assert(hd_extended_key_generate_master(&m, s_tv2_seed,
 					       sizeof(s_tv2_seed)));
 	assert(compare_serialized_pub(&m, &tv2_m_xpub));
@@ -557,7 +575,7 @@ static void test_vector_2()
 	// Chain m/0
 
 	struct hd_extended_key m_0;
-	assert(hd_extended_key_init(&m_0));
+	hd_extended_key_init(&m_0);
 	assert(hd_extended_key_generate_child(&m, 0x0, &m_0));
 	assert(compare_serialized_pub(&m_0, &tv2_m_0_xpub));
 	assert(compare_serialized_prv(&m_0, &tv2_m_0_xprv));
@@ -565,7 +583,7 @@ static void test_vector_2()
 	// Chain m/0/2147483647H
 
 	struct hd_extended_key m_0_2147483647H;
-	assert(hd_extended_key_init(&m_0_2147483647H));
+	hd_extended_key_init(&m_0_2147483647H);
 	assert(hd_extended_key_generate_child(&m_0, 0x80000000 | 2147483647,
 					      &m_0_2147483647H));
 	assert(compare_serialized_pub(&m_0_2147483647H,
@@ -576,7 +594,7 @@ static void test_vector_2()
 	// Chain m/0/2147483647H/1
 
 	struct hd_extended_key m_0_2147483647H_1;
-	assert(hd_extended_key_init(&m_0_2147483647H_1));
+	hd_extended_key_init(&m_0_2147483647H_1);
 	assert(hd_extended_key_generate_child(&m_0_2147483647H, 1,
 					      &m_0_2147483647H_1));
 	assert(compare_serialized_pub(&m_0_2147483647H_1,
@@ -587,7 +605,7 @@ static void test_vector_2()
 	// Chain m/0/2147483647H/1/2147483646H
 
 	struct hd_extended_key m_0_2147483647H_1_2147483646H;
-	assert(hd_extended_key_init(&m_0_2147483647H_1_2147483646H));
+	hd_extended_key_init(&m_0_2147483647H_1_2147483646H);
 	assert(hd_extended_key_generate_child(&m_0_2147483647H_1,
 					      0x80000000 | 2147483646,
 					      &m_0_2147483647H_1_2147483646H));
@@ -599,7 +617,7 @@ static void test_vector_2()
 	// Chain m/0/2147483647H/1/2147483646H/2
 
 	struct hd_extended_key m_0_2147483647H_1_2147483646H_2;
-	assert(hd_extended_key_init(&m_0_2147483647H_1_2147483646H_2));
+	hd_extended_key_init(&m_0_2147483647H_1_2147483646H_2);
 	assert(hd_extended_key_generate_child(&m_0_2147483647H_1_2147483646H, 2,
 					      &m_0_2147483647H_1_2147483646H_2));
 	assert(compare_serialized_pub(&m_0_2147483647H_1_2147483646H_2,
@@ -624,6 +642,7 @@ int main(int argc, char **argv)
 
 	// Keep valgrind happy
 	ERR_remove_state(0);
+	bp_key_static_shutdown();
 
 	return 0;
 }

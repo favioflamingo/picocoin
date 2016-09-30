@@ -5,21 +5,16 @@
  * file COPYING or http://www.opensource.org/licenses/mit-license.php.
  */
 
-enum {
-	PROTO_VERSION		= 60002,
-};
+#include <ccoin/buint.h>                // for bu256_t
+#include <ccoin/hashtab.h>              // for bp_hashtab_get
 
-#ifdef __APPLE__
-#  define off64_t off_t
-#  define lseek64 lseek
-#endif
+#include <stdint.h>                     // for uint64_t
 
 /* main.c */
 extern struct bp_hashtab *settings;
 extern const struct chain_info *chain;
 extern bu256_t chain_genesis;
 extern uint64_t instance_nonce;
-extern bool debugging;
 
 static inline char *setting(const char *key)
 {

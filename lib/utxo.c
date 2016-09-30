@@ -30,6 +30,18 @@ void bp_utxo_free(struct bp_utxo *coin)
 	bp_utxo_free_vout(coin);
 }
 
+void bp_utxo_freep(void *p)
+{
+	struct bp_utxo *coin = p;
+	if (!coin)
+		return;
+
+	bp_utxo_free(coin);
+
+	memset(coin, 0, sizeof(*coin));
+	free(coin);
+}
+
 bool bp_utxo_from_tx(struct bp_utxo *coin, const struct bp_tx *tx,
 		     bool is_coinbase, unsigned int height)
 {
@@ -41,7 +53,7 @@ bool bp_utxo_from_tx(struct bp_utxo *coin, const struct bp_tx *tx,
 	coin->height = height;
 	coin->version = tx->nVersion;
 
-	coin->vout = parr_new(tx->vout->len, bp_txout_free_cb);
+	coin->vout = parr_new(tx->vout->len, bp_txout_freep);
 	unsigned int i;
 
 	for (i = 0; i < tx->vout->len; i++) {

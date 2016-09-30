@@ -17,12 +17,12 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-AC_INIT([picocoin], [0.1], [Jeff Garzik <jgarzik@exmulti.com>])
+AC_INIT([picocoin], 0.5, [Jeff Garzik <jgarzik@pobox.com>])
 AC_PREREQ(2.60)
 LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/main.c])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE(foreign subdir-objects)
 AC_CONFIG_HEADERS([picocoin-config.h])
 
 dnl Make sure anyone changing configure.ac/Makefile.am has a clue
@@ -58,8 +58,8 @@ case "${host}" in
 		#ifndef O_LARGEFILE
 		# define O_LARGEFILE 0
 		#endif])
-		CPPFLAGS="$CPPFLAGS -I/usr/local/opt/openssl/include"
-		LDFLAGS="$LDFLAGS -L/usr/local/opt/openssl/lib"
+		CPPFLAGS="$CPPFLAGS -I/usr/local/opt/openssl/include -I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/opt/openssl/lib -L/usr/local/lib"
 		;;
 esac
 
@@ -103,7 +103,7 @@ AS_IF([test "$enable_coverage" = "yes"], [
 	AC_PATH_PROG(LCOV, lcov, no)
 	AS_IF([test "$LCOV" = "no"], [
 		AC_MSG_ERROR(lcov tool is not installed)])
-	CFLAGS="$CFLAGS -O0 -fprofile-arcs -ftest-coverage"
+	CFLAGS="-O0 -fprofile-arcs -ftest-coverage"
 ])
 
 dnl Valgrind
@@ -120,6 +120,16 @@ AS_IF([test "$enable_valgrind" = "yes"], [
 		AC_MSG_ERROR(valgrind tool is not installed)])
 ])
 AM_CONDITIONAL(ENABLE_VALGRIND, [test "$enable_valgrind" = "yes"])
+
+dnl secp256k1 tests
+AC_MSG_CHECKING([whether to enable tests for secp256k1 lib])
+AC_ARG_ENABLE([secp256k1-tests],
+	[AS_HELP_STRING([--enable-secp256k1-tests],[Run secp256k1 tests as part fo make check])],
+	[],
+	[enable_secp256k1_tests=no])
+AC_MSG_RESULT([$enable_secp256k1_tests])
+AS_IF([test "$enable_secp256k1_tests" = "no"],
+	[ac_configure_args="$ac_configure_args --enable-tests=no"])
 
 dnl Electric Fence
 AC_MSG_CHECKING([whether to enable electric fence (www.perens.com)])
@@ -145,6 +155,7 @@ AC_SUBST(EVENT_LIBS)
 AC_SUBST(JANSSON_LIBS)
 AC_SUBST(ARGP_LIBS)
 
+AC_CONFIG_SUBDIRS([external/secp256k1])
 AC_CONFIG_FILES([
 	Makefile
 	m4/Makefile
@@ -154,5 +165,6 @@ AC_CONFIG_FILES([
 	lib/Makefile
 	src/Makefile
 	test/Makefile
+	external/Makefile
 	])
 AC_OUTPUT
