@@ -479,22 +479,22 @@ bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode) 
 
 	if (data->len == 0) {
 		// Could have used OP_0.
-		return opcode == OP_0;
+		return opcode == ccoin_OP_0;
 	} else if (data->len == 1 && vch[0] >= 1 && vch[0] <= 16) {
 		// Could have used OP_1 .. OP_16.
-		return opcode == OP_1 + (vch[0] - 1);
+		return opcode == ccoin_OP_1 + (vch[0] - 1);
 	} else if (data->len == 1 && vch[0] == 0x81) {
 		// Could have used OP_1NEGATE.
-		return opcode == OP_1NEGATE;
+		return opcode == ccoin_OP_1NEGATE;
 	} else if (data->len <= 75) {
 		// Could have used a direct push (opcode indicating number of bytes pushed + those bytes).
 		return opcode == data->len;
 	} else if (data->len <= 255) {
 		// Could have used OP_PUSHDATA.
-		return opcode == OP_PUSHDATA1;
+		return opcode == ccoin_OP_PUSHDATA1;
 	} else if (data->len <= 65535) {
 		// Could have used OP_PUSHDATA2.
-		return opcode == OP_PUSHDATA2;
+		return opcode == ccoin_OP_PUSHDATA2;
 	}
     return true;
 }
@@ -617,11 +617,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 
 		if (op.data.len > MAX_SCRIPT_ELEMENT_SIZE)
 			goto out;
-<<<<<<< HEAD
-		if (opcode > ccoin_OP_16 && ++nOpCount > 201)
-=======
-		if (opcode > OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
->>>>>>> jgarzik/master
+		if (opcode >ccoin_OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
 			goto out;
 		if (disabled_op[opcode])
 			goto out;
@@ -629,12 +625,9 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 		if (fExec && is_bsp_pushdata(opcode)) {
 			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
 				goto out;
-			stack_push(stack, (struct buffer *) &op.data);
-<<<<<<< HEAD
-		else if (fExec || (ccoin_OP_IF <= opcode && opcode <= ccoin_OP_ENDIF))
-=======
-		} else if (fExec || (OP_IF <= opcode && opcode <= OP_ENDIF))
->>>>>>> jgarzik/master
+			stack_push(stack, (struct buffer *) &op.data);}
+		else if (fExec || (ccoin_OP_IF <= opcode && opcode <= ccoin_OP_ENDIF)) 
+
 		switch (opcode) {
 
 		//
@@ -664,15 +657,10 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 		//
 		// Control
 		//
-<<<<<<< HEAD
 		case ccoin_OP_NOP:
-		case ccoin_OP_NOP1: case ccoin_OP_NOP2: case ccoin_OP_NOP3: case ccoin_OP_NOP4: case ccoin_OP_NOP5:
-		case ccoin_OP_NOP6: case ccoin_OP_NOP7: case ccoin_OP_NOP8: case ccoin_OP_NOP9: case ccoin_OP_NOP10:
-=======
-		case OP_NOP:
 			break;
 
-		case OP_CHECKLOCKTIMEVERIFY: {
+		case ccoin_OP_CHECKLOCKTIMEVERIFY: {
 			if (!(flags & SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY)) {
 				// not enabled; treat as a NOP2
 				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
@@ -716,7 +704,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_CHECKSEQUENCEVERIFY:
+		case ccoin_OP_CHECKSEQUENCEVERIFY:
 		{
 			if (!(flags & SCRIPT_VERIFY_CHECKSEQUENCEVERIFY)) {
 				// not enabled; treat as a NOP3
@@ -755,11 +743,10 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_NOP1: case OP_NOP4: case OP_NOP5:
-		case OP_NOP6: case OP_NOP7: case OP_NOP8: case OP_NOP9: case OP_NOP10:
+		case ccoin_OP_NOP1: case ccoin_OP_NOP4: case ccoin_OP_NOP5:
+		case ccoin_OP_NOP6: case ccoin_OP_NOP7: case ccoin_OP_NOP8: case ccoin_OP_NOP9: case ccoin_OP_NOP10:
 			if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
 				goto out;
->>>>>>> jgarzik/master
 			break;
 
 		case ccoin_OP_IF:

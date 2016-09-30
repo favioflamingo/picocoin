@@ -197,9 +197,9 @@ enum opcodetype
 	// expansion
 	ccoin_OP_NOP1 = 0xb0,
 	ccoin_OP_CHECKLOCKTIMEVERIFY = 0xb1,
-	ccoin_OP_NOP2 = OP_CHECKLOCKTIMEVERIFY,
+	ccoin_OP_NOP2 = ccoin_OP_CHECKLOCKTIMEVERIFY,
 	ccoin_OP_CHECKSEQUENCEVERIFY = 0xb2,
-	ccoin_OP_NOP3 = OP_CHECKSEQUENCEVERIFY,
+	ccoin_OP_NOP3 = ccoin_OP_CHECKSEQUENCEVERIFY,
 	ccoin_OP_NOP4 = 0xb3,
 	ccoin_OP_NOP5 = 0xb4,
 	ccoin_OP_NOP6 = 0xb5,
