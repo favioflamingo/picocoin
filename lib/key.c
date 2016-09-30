@@ -291,3 +291,88 @@ bool bp_key_add_secret(struct bp_key *out,
 	memcpy(&out->pubkey, &key->pubkey, sizeof(secp256k1_pubkey));
 	return secp256k1_ec_pubkey_tweak_add(ctx, &out->pubkey, tweak32);
 }
+
+
+
+
+/* for backward compatibility, make sure that we can get an EC Key */
+bool bp_key_init_eckey(EC_KEY *key)
+{
+	memset(key, 0, sizeof(*key));
+
+	key = EC_KEY_new_by_curve_name(NID_secp256k1);
+	if (!key)
+		return false;
+
+	return true;
+}
+
+void bp_key_free_eckey(EC_KEY *key)
+{
+	if (key) {
+		EC_KEY_free(key);
+	}
+}
+
+bool bp_pubkey_set_eckey(EC_KEY *key, const void *pubkey_, size_t pk_len)
+{
+	const unsigned char *pubkey = pubkey_;
+	if (!o2i_ECPublicKey(&key, &pubkey, pk_len))
+		return false;
+	if (pk_len == 33)
+		EC_KEY_set_conv_form(key, POINT_CONVERSION_COMPRESSED);
+	return true;
+}
+
+
+bool bp_privkey_set_eckey(EC_KEY *key, const void *privkey_, size_t pk_len)
+{
+	const unsigned char *privkey = privkey_;
+	if (!d2i_ECPrivateKey(&key, &privkey, pk_len))
+		return false;
+	if (!EC_KEY_check_key(key))
+		return false;
+
+	EC_KEY_set_conv_form(key, POINT_CONVERSION_COMPRESSED);
+
+	return true;
+}
+
+EC_KEY* bp_key_eckey_get(const struct bp_key *key){
+	EC_KEY* ans;
+	if(!bp_key_eckey(ans,key))
+		return NULL;
+	else
+		return ans;
+}
+
+bool bp_key_eckey(EC_KEY* ans, const struct bp_key *key){
+	if(! bp_key_init_eckey(ans))
+		return false;
+
+	uint8_t 		secret[32];
+	uint8_t		pubkey[60]
+	size_t		pk_len;
+	if(bp_key_secret_get(secret, 32, key)){
+		// have secret
+		if(!bp_privkey_set_eckey(ans,secret,32))
+			goto err;
+		return true;
+	}
+	else if (!bp_pubkey_get(key, &pubkey, &pk_len)){
+		// have public key
+		if(!bp_pubkey_set_eckey(ans, pubkey, pk_len))
+			goto err;
+		return true;
+	}
+	else{
+		goto err;
+	}
+err:
+	bp_key_free_eckey(ans);
+	return false;
+
+}
+
+
+

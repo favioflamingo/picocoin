@@ -6,7 +6,7 @@
  */
 
 #include <stdbool.h>
-
+#include <openssl/ec.h>
 #include <secp256k1.h>
 
 #include <ccoin/buint.h>
@@ -21,6 +21,10 @@ struct bp_key {
 	uint8_t 		secret[32];
 	secp256k1_pubkey	pubkey;
 };
+
+// for backward compatibility, need function to derive EC object from k (copies data)
+extern bool bp_key_eckey(EC_KEY* ans,const struct bp_key *key);
+extern EC_KEY* bp_key_eckey_get(const struct bp_key *key);
 
 /// Frees any internally allocated static data.
 extern void bp_key_static_shutdown();
