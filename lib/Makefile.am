@@ -1,9 +1,12 @@
-
-AM_CPPFLAGS	= -I$(top_srcdir)/include
+AM_CPPFLAGS	=   -I$(top_srcdir)/include \
+                -I$(top_srcdir)/external/secp256k1/include \
+                -I$(top_srcdir)/external/secp256k1/contrib
 
 lib_LTLIBRARIES= libccoin.la
 
-libccoin_la_LIBADD= -lm
+libccoin_la_LIBADD= -lm \
+                    $(top_builddir)/external/secp256k1/libsecp256k1.la
+
 libccoin_la_SOURCES=	\
 	address.c	\
 	addr_match.c	\
@@ -20,7 +23,6 @@ libccoin_la_SOURCES=	\
 	core.c		\
 	coredefs.c	\
 	cstr.c		\
-	dns.c		\
 	hdkeys.c	\
 	hexcode.c	\
 	file_seq.c	\
@@ -31,7 +33,6 @@ libccoin_la_SOURCES=	\
 	mbr.c		\
 	memmem.c	\
 	message.c	\
-	net.c		\
 	parr.c		\
 	script.c	\
 	script_eval.c	\
@@ -41,5 +42,11 @@ libccoin_la_SOURCES=	\
 	util.c		\
 	utxo.c		\
 	wallet.c
-# is the soname version info going to just be libccoin.so.0.0.0
-# libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:1
+
+noinst_LTLIBRARIES= libccoinnet.la
+
+libccoinnet_la_SOURCES=	\
+	net/dns.c	\
+	net/net.c	\
+	net/netbase.c	\
+	net/peerman.c

@@ -2,6 +2,7 @@
 # directories
 .deps
 autom4te.cache
+.dirstamp
 
 *.o
 *.lo
@@ -32,3 +33,4 @@ test-driver
 picocoin*.tar.gz
 picocoin-config.h*
 
+.project

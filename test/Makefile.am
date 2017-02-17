@@ -5,7 +5,8 @@ if ENABLE_VALGRIND
 endif
 
 AM_CPPFLAGS	= -DTEST_SRCDIR=\"$(top_srcdir)/test\" \
-		  -I$(top_srcdir)/include
+		  -I$(top_srcdir)/include \
+		  -I$(top_srcdir)/external/secp256k1/include
 
 EXTRA_DIST	= \
 	base58_encode_decode.json	\
@@ -16,8 +17,7 @@ EXTRA_DIST	= \
 	blks10.ser \
 	hdr193000.ser tn_hdr35141.ser \
 	tn_blk35133.ser wallet-basics.json \
-	script_valid.json script_invalid.json \
-	tx_valid.json tx_invalid.json
+	script_tests.json tx_valid.json tx_invalid.json
 
 noinst_LIBRARIES= libtest.a
 
@@ -31,7 +31,8 @@ TESTS		= clist cstr hex hdkeys hashtab base58 fileio util keyset bloom \
 		  message parr script-parse tx block blockfile blkdb script \
 		  tx-valid wallet wallet-basics chain-verf
 
-COMMON_LDADD	= libtest.a ../lib/libccoin.la \
+COMMON_LDADD	= libtest.a $(top_builddir)/lib/libccoin.la \
+		  $(top_builddir)/external/secp256k1/libsecp256k1.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @JANSSON_LIBS@ @MATH_LIBS@
 
 base58_LDADD        = $(COMMON_LDADD)
@@ -53,6 +54,6 @@ script_LDADD		= $(COMMON_LDADD)
 script_parse_LDADD	= $(COMMON_LDADD)
 tx_LDADD            = $(COMMON_LDADD)
 tx_valid_LDADD		= $(COMMON_LDADD)
-util_LDADD		    = $(COMMON_LDADD)
+util_LDADD		    = $(COMMON_LDADD) ../lib/libccoinnet.la
 wallet_LDADD		= $(COMMON_LDADD)
 wallet_basics_LDADD	= $(COMMON_LDADD)
