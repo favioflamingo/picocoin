@@ -1,22 +1,28 @@
 Source: picocoin
 Priority: optional
 Maintainer: Joel DeJesus <dejesus.joel@e-flamingo.jp>
-Build-Depends: debhelper (>= 9), libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev, valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
-Standards-Version: 3.9.5
+Build-Depends: debhelper (>= 9),  libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
+Standards-Version: 3.9.6
 Section: libs
 #Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://anonscm.debian.org/collab-maint/picocoin.git
 #Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/picocoin.git;a=summary
 
-Package: picocoin-dev
+Package: libccoin-dev
 Section: libdevel
 Architecture: any
-Depends: picocoin0 (= ${binary:Version}), ${misc:Depends}
+Depends: libccoin (= ${binary:Version}), ${misc:Depends}
 Description: bitcoin library - development files
  This package contains headers for bitcoin c functions that allow for bitcoin operations and connection to the bitcoin network.
 
-Package: picocoin0
+Package: libccoin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: bitcoin library - shared library
+ This package contains bitcoin c functions that allow for bitcoin operations and connection to the bitcoin network.
+
+Package: picocoin
+Architecture: any
+Depends: libccoin (= ${binary:Version}), ${misc:Depends}
 Description: bitcoin library - shared library
  This package contains bitcoin c functions that allow for bitcoin operations and connection to the bitcoin network.

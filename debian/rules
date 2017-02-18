@@ -15,8 +15,13 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 #	dh_auto_configure -- --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr 
 #	dh_auto_configure -- \
 #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+
 override_dh_auto_configure:
 	dh_auto_configure -- --enable-valgrind --prefix /usr
 
 override_dh_auto_test:
-	make check
+	FORCE_SCRIPT_VERF=1 make check
+
+
+#override_dh_installdirs:
+#	dh_installdirs
