@@ -42,4 +42,4 @@ libccoin_la_SOURCES=	\
 	utxo.c		\
 	wallet.c
 # is the soname version info going to just be libccoin.so.0.0.0
-# libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:1
+libccoin_la_LDFLAGS = -module -shared  -version-info 1:1:0
