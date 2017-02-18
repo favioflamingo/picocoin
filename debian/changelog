@@ -1,4 +1,4 @@
-picocoin (0.1-2) jessie; urgency=low
+picocoin (0.1-2+nmu1) jessie; urgency=low
 
   [ Joel DeJesus (Work Email) ]
   * Initial release
