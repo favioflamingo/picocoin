@@ -23,5 +23,6 @@ override_dh_auto_test:
 	FORCE_SCRIPT_VERF=1 make check
 
 
-#override_dh_installdirs:
-#	dh_installdirs
+override_dh_install:
+	dh_install
+	find -name 'libccoin.la' -exec sed -i "/dependency_libs/ s/'.*'/''/" {} \;
