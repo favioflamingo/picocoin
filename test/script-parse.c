@@ -34,10 +34,10 @@ static void test_txout(const struct bp_txout *txout)
 	bsp_start(&bsp, &buf);
 
 	while (bsp_getop(&op, &bsp)) {
-		struct bscript_op *op_p;
+		struct bscript_op *ccoin_OP_p;
 
-		op_p = memdup(&op, sizeof(op));
-		ops = clist_append(ops, op_p);
+		ccoin_OP_p = memdup(&op, sizeof(op));
+		ops = clist_append(ops, ccoin_OP_p);
 	}
 
 	assert(!bsp.error);
@@ -49,15 +49,15 @@ static void test_txout(const struct bp_txout *txout)
 	clist *tmp = ops;
 	cstring *s = cstr_new_sz(256);
 	while (tmp) {
-		struct bscript_op *op_p;
+		struct bscript_op *ccoin_OP_p;
 
-		op_p = tmp->data;
+		ccoin_OP_p = tmp->data;
 		tmp = tmp->next;
 
-		if (is_bsp_pushdata(op_p->op)) {
-			bsp_push_data(s, op_p->data.p, op_p->data.len);
+		if (is_bsp_pushdata(ccoin_OP_p->op)) {
+			bsp_push_data(s, ccoin_OP_p->data.p, ccoin_OP_p->data.len);
 		} else {
-			bsp_push_op(s, op_p->op);
+			bsp_push_op(s, ccoin_OP_p->op);
 		}
 	}
 
@@ -114,10 +114,10 @@ static void runtest(const char *ser_fn_base)
 
 int main (int argc, char *argv[])
 {
-	const char *opn = GetOpName(OP_PUBKEY);
-	assert(!strcmp(opn, "OP_PUBKEY"));
+	const char *opn = GetOpName(ccoin_OP_PUBKEY);
+	assert(!strcmp(opn, "ccoin_OP_PUBKEY"));
 
-	opn = GetOpName(OP_INVALIDOPCODE);
+	opn = GetOpName(ccoin_OP_INVALIDOPCODE);
 	assert(!strcmp(opn, "<unknown>"));
 
 	runtest("blk120383.ser");

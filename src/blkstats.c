@@ -41,8 +41,8 @@ enum stat_type {
 	STA_TX,
 	STA_TXOUT,
 	STA_MULTISIG,
-	STA_OP_DROP,
-	STA_OP_RETURN,
+	STA_ccoin_OP_DROP,
+	STA_ccoin_OP_RETURN,
 	STA_PUBKEY,
 	STA_PUBKEYHASH,
 	STA_SCRIPTHASH,
@@ -56,8 +56,8 @@ static const char *stat_names[STA_LAST + 1] = {
 	"tx",
 	"txout",
 	"multisig",
-	"op_drop",
-	"op_return",
+	"ccoin_OP_drop",
+	"ccoin_OP_return",
 	"pubkey",
 	"pubkeyhash",
 	"scripthash",
@@ -100,7 +100,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 
 static int block_fd = -1;
 
-static bool match_op_pos(parr *script, enum opcodetype opcode,
+static bool match_ccoin_OP_pos(parr *script, enum opcodetype opcode,
 			 unsigned int pos)
 {
 	if (pos >= script->len)
@@ -137,10 +137,10 @@ static void scan_txout(struct bp_txout *txout)
 		incstat(STA_MULTISIG);
 		break;
 	default: {
-		if (match_op_pos(script, OP_RETURN, 0))
-			incstat(STA_OP_RETURN);
-		else if (match_op_pos(script, OP_DROP, 1))
-			incstat(STA_OP_DROP);
+		if (match_ccoin_OP_pos(script, ccoin_OP_RETURN, 0))
+			incstat(STA_ccoin_OP_RETURN);
+		else if (match_ccoin_OP_pos(script, ccoin_OP_DROP, 1))
+			incstat(STA_ccoin_OP_DROP);
 		else
 			incstat(STA_UNKNOWN);
 		break;
