@@ -13,8 +13,12 @@ brd_SOURCES=		\
 	brd.c		\
 	brd.h
 
+brd_LDFLAGS = $(AM_LDFLAGS) -static
+
 brd_LDADD	= libnode.a ../lib/libccoin.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @EVENT_LIBS@
+
+
 
 picocoin_SOURCES=	\
 	aes.c		\
@@ -28,9 +32,14 @@ picocoin_LDADD	= libnode.a ../lib/libccoin.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@ \
 		  @EVENT_LIBS@ @JANSSON_LIBS@
 
+picocoin_LDFLAGS = $(AM_LDFLAGS) -static
+
 blkscan_LDADD	= ../lib/libccoin.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@
 blkstats_LDADD	= ../lib/libccoin.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@
+blkstats_LDFLAGS = $(AM_LDFLAGS) -static
+
 rawtx_LDADD	= ../lib/libccoin.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@ @JANSSON_LIBS@
+rawtx_LDFLAGS = $(AM_LDFLAGS) -static
