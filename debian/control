@@ -1,7 +1,7 @@
 Source: picocoin
 Priority: optional
 Maintainer: Joel DeJesus <dejesus.joel@e-flamingo.jp>
-Build-Depends: debhelper (>= 9),  libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
+Build-Depends: debhelper (>= 9),  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
 Standards-Version: 3.9.6
 Section: libs
 #Homepage: <insert the upstream URL, if relevant>
