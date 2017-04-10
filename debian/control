@@ -1,12 +1,12 @@
 Source: picocoin
 Priority: optional
-Maintainer: Joel DeJesus <dejesus.joel@e-flamingo.jp>
+Maintainer: Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>
 Build-Depends: debhelper (>= 9),  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
 Standards-Version: 3.9.8
 Section: libs
-#Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://anonscm.debian.org/collab-maint/picocoin.git
-#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/picocoin.git;a=summary
+Homepage: https://github.com/favioflamingo/picocoin
+Vcs-Git: https://github.com/favioflamingo/picocoin.git
+Vcs-Browser: https://github.com/favioflamingo/picocoin
 
 Package: libccoin-dev
 Section: libdevel
