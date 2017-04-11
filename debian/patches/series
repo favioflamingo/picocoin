@@ -1,7 +1,3 @@
-0001-adding-proper-version-numbers-to-soname.patch
-0002-changed-operator-names-in-order-to-be-compatible-wit.patch
-0003-adding-static-linking-to-binaries-to-eliminate-need-.patch
-0004-undoing-linking-change-to-binaries.patch
-0005-fixing-soname-problem.patch
-0006-changing-library-name-to-match-soname.patch
-0007-undoing-library-name-change.patch
+0001-adding-library-version-info.patch
+0002-appending-ccoin_-to-operator-names.patch
+0003-changed-OP-to-ccoin_OP.patch
