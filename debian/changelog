@@ -1,12 +1,20 @@
-picocoin (0.1-4~2.gbpa56e43) UNRELEASED; urgency=medium
+picocoin (0.1-4~4.gbp759bee) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @a56e4304a10ea0c36e72d8c8fbde2a23649b691d **
+  ** SNAPSHOT build @759bee0ca091f39af3bde1b1005fbec839d6c389 **
 
   [ Joel De Jesus ]
   * UNRELEASED
 
   [ Joel DeJesus ]
   * incrementing soname and version
+  * incrementing soname and version
+
+  [ Joel De Jesus ]
+
+  [ Joel DeJesus ]
+  * adding more lib fixes
+
+  [ Joel De Jesus ]
 
  -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 16:53:22 +0900
 
