@@ -125,8 +125,6 @@ dnl secp256k1 tests
 AC_MSG_CHECKING([whether to enable tests for secp256k1 lib])
 AC_ARG_ENABLE([secp256k1-tests],
 	[AS_HELP_STRING([--enable-secp256k1-tests],[Run secp256k1 tests as part fo make check])],
-<<<<<<< HEAD
-=======
 	[],
 	[enable_secp256k1_tests=no])
 AC_MSG_RESULT([$enable_secp256k1_tests])
@@ -137,7 +135,6 @@ dnl Electric Fence
 AC_MSG_CHECKING([whether to enable electric fence (www.perens.com)])
 AC_ARG_ENABLE([efence],
 	[AS_HELP_STRING([--enable-efence],[Enable Electric Fence Malloc Debugger])],
->>>>>>> upstream-0.2
 	[],
 	[enable_secp256k1_tests=no])
 AC_MSG_RESULT([$enable_secp256k1_tests])
