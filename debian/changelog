@@ -1,33 +1,15 @@
-picocoin (0.1-4~6.gbp4f78c2) UNRELEASED; urgency=medium
+picocoin (0.1-4) jessie; urgency=medium
 
-  ** SNAPSHOT build @4f78c2e6bcf8e7f35874eb4c74b671b99957854e **
-
-  [ Joel De Jesus ]
-  * UNRELEASED
-
-  [ Joel DeJesus ]
-  * incrementing soname and version
+  [ Joel Manuel De Jesus (Work Account) ]
   * incrementing soname and version
 
-  [ Joel De Jesus ]
-
-  [ Joel DeJesus ]
+  [ Joel Manuel De Jesus (Work Account) ]
   * adding more lib fixes
 
-  [ Joel De Jesus ]
-
-  [ Joel DeJesus ]
-  * adding more lib fixes
-  * matching soname
-
-  [ Joel De Jesus ]
-
-  [ Joel DeJesus ]
+  [ Joel Manuel De Jesus (Work Account) ]
   * undoing library name change
 
-  [ Joel De Jesus ]
-
- -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 16:53:22 +0900
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 19:21:57 +0900
 
 picocoin (0.1-3) jessie; urgency=medium
 

@@ -1,7 +1,7 @@
 Source: picocoin
 Priority: optional
 Maintainer: Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>
-Build-Depends: debhelper,  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
+Build-Depends: debhelper (>= 9.0 ),  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
 Standards-Version: 3.9.8
 Section: libs
 Homepage: https://github.com/favioflamingo/picocoin
@@ -12,16 +12,22 @@ Package: libccoin-dev
 Section: libdevel
 Architecture: any
 Depends: libccoin0 (= ${binary:Version}), ${misc:Depends}
+Recommends: picocoin
 Description: bitcoin library - development files
- This package contains headers for bitcoin c functions that allow for bitcoin
- operations and connection to the bitcoin network.
+ This package contains headers for bitcoin c functions 
+ that allow for bitcoin operations and connection to 
+ the bitcoin network.  For an example on how to use
+ this library, see the picocoin package.
 
 Package: libccoin0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: bitcoin library - shared library
- This package contains bitcoin c functions that allow for bitcoin 
- operations and connection to the bitcoin network.
+ This package contains bitcoin c functions that allow 
+ for bitcoin operations and connection to the 
+ bitcoin network.  It includes code for an 
+ SPV, as well as a full node.  This version 
+ of the library still relies on OpenSSL.
 
 Package: picocoin
 Section: misc
@@ -29,4 +35,6 @@ Architecture: any
 Depends: libccoin0 (= ${binary:Version}),  ${shlibs:Depends}, ${misc:Depends}
 Description: spv client and block utilities
  This package contains binaries that include an spv client
- and block analyzers.
+ and block analyzers.  It serves as an example to 
+ developers on how to write C programs that link
+ to this library.
