@@ -12,7 +12,6 @@ brd_LDADD	= $(top_builddir)/lib/libccoin.la \
 		  $(top_builddir)/lib/libccoinnet.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @EVENT_LIBS@
 
-
 picocoin_SOURCES=	\
 	main.c		\
 	picocoin.h	\
