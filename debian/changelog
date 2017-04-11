@@ -1,10 +1,22 @@
-picocoin (0.1-3~1.gbp09edfb) UNRELEASED; urgency=medium
+picocoin (0.1-4~2.gbpa56e43) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @09edfb05d545f018f869b479dd354baf6f6cd943 **
+  ** SNAPSHOT build @a56e4304a10ea0c36e72d8c8fbde2a23649b691d **
 
+  [ Joel De Jesus ]
   * UNRELEASED
 
- -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 14:58:59 +0900
+  [ Joel DeJesus ]
+  * incrementing soname and version
+
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 16:53:22 +0900
+
+picocoin (0.1-3) jessie; urgency=medium
+
+  [ Joel Manuel De Jesus (Work Account) ]
+  * incrementing version and modifying soname
+  * incrementing soname and version
+
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 15:33:00 +0900
 
 picocoin (0.1-2) jessie; urgency=low
 
