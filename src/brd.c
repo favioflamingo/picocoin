@@ -2,7 +2,6 @@
  * Distributed under the MIT/X11 software license, see the accompanying
  * file COPYING or http://www.opensource.org/licenses/mit-license.php.
  */
-
 #include "picocoin-config.h"           // for VERSION, _LARGE_FILES, etc
 #include "brd.h"
 #include <ccoin/blkdb.h>                // for blkinfo, blkdb, etc

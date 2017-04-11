@@ -43,9 +43,6 @@ libccoin_la_SOURCES=	\
 	utxo.c		\
 	wallet.c
 
-
-# is the soname version info going to just be libccoin.so.0.0.0
-# libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:1
 noinst_LTLIBRARIES= libccoinnet.la
 
 libccoinnet_la_SOURCES=	\
@@ -53,4 +50,3 @@ libccoinnet_la_SOURCES=	\
 	net/net.c	\
 	net/netbase.c	\
 	net/peerman.c
-

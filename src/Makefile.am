@@ -8,7 +8,8 @@ brd_SOURCES=		\
 	brd.c		\
 	brd.h
 
-brd_LDADD	= ../lib/libccoin.la ../lib/libccoinnet.la \
+brd_LDADD	= $(top_builddir)/lib/libccoin.la \
+		  $(top_builddir)/lib/libccoinnet.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @EVENT_LIBS@
 
 
@@ -18,7 +19,8 @@ picocoin_SOURCES=	\
 	aes.c           \
         wallet.c wallet.h
 
-picocoin_LDADD	= ../lib/libccoin.la ../lib/libccoinnet.la \
+picocoin_LDADD	= $(top_builddir)/lib/libccoin.la \
+		  $(top_builddir)/lib/libccoinnet.la \
 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@ \
 		  @EVENT_LIBS@ @JANSSON_LIBS@
 
