@@ -3,3 +3,5 @@
 0003-adding-static-linking-to-binaries-to-eliminate-need-.patch
 0004-undoing-linking-change-to-binaries.patch
 0005-fixing-soname-problem.patch
+0006-changing-library-name-to-match-soname.patch
+0007-undoing-library-name-change.patch

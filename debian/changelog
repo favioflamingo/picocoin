@@ -1,6 +1,6 @@
-picocoin (0.1-4~4.gbp759bee) UNRELEASED; urgency=medium
+picocoin (0.1-4~6.gbp4f78c2) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @759bee0ca091f39af3bde1b1005fbec839d6c389 **
+  ** SNAPSHOT build @4f78c2e6bcf8e7f35874eb4c74b671b99957854e **
 
   [ Joel De Jesus ]
   * UNRELEASED
@@ -13,6 +13,17 @@ picocoin (0.1-4~4.gbp759bee) UNRELEASED; urgency=medium
 
   [ Joel DeJesus ]
   * adding more lib fixes
+
+  [ Joel De Jesus ]
+
+  [ Joel DeJesus ]
+  * adding more lib fixes
+  * matching soname
+
+  [ Joel De Jesus ]
+
+  [ Joel DeJesus ]
+  * undoing library name change
 
   [ Joel De Jesus ]
 

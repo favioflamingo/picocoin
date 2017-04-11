@@ -1,0 +1,86 @@
+From: Joel DeJesus <dejesus.joel@e-flamingo.jp>
+Date: Tue, 11 Apr 2017 18:54:31 +0900
+Subject: undoing library name change
+
+---
+ lib/Makefile.am  |  8 ++++----
+ src/Makefile.am  | 10 +++++-----
+ test/Makefile.am |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 58e3c0a..f5a5172 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -1,10 +1,10 @@
+ 
+ AM_CPPFLAGS	= -I$(top_srcdir)/include
+ 
+-lib_LTLIBRARIES= libccoin0.la
++lib_LTLIBRARIES= libccoin.la
+ 
+-libccoin0_la_LIBADD= -lm
+-libccoin0_la_SOURCES=	\
++libccoin_la_LIBADD= -lm
++libccoin_la_SOURCES=	\
+ 	address.c	\
+ 	addr_match.c	\
+ 	base58.c	\
+@@ -42,7 +42,7 @@ libccoin0_la_SOURCES=	\
+ 	utxo.c		\
+ 	wallet.c
+ # current:revision:age 
+-libccoin0_la_LDFLAGS = -module -shared  -version-info 0:1:0
++libccoin_la_LDFLAGS = -module -shared  -version-info 0:1:0
+ 
+ 
+ 
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 3c11132..75726ae 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -15,7 +15,7 @@ brd_SOURCES=		\
+ 
+ #brd_LDFLAGS = $(AM_LDFLAGS) -static
+ 
+-brd_LDADD	= libnode.a ../lib/libccoin0.la \
++brd_LDADD	= libnode.a ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @EVENT_LIBS@
+ 
+ 
+@@ -28,18 +28,18 @@ picocoin_SOURCES=	\
+ 	picocoin.h	\
+ 	wallet.c wallet.h
+ 
+-picocoin_LDADD	= libnode.a ../lib/libccoin0.la \
++picocoin_LDADD	= libnode.a ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@ \
+ 		  @EVENT_LIBS@ @JANSSON_LIBS@
+ 
+ #picocoin_LDFLAGS = $(AM_LDFLAGS) -static
+ 
+-blkscan_LDADD	= ../lib/libccoin0.la \
++blkscan_LDADD	= ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@
+-blkstats_LDADD	= ../lib/libccoin0.la \
++blkstats_LDADD	= ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@
+ #blkstats_LDFLAGS = $(AM_LDFLAGS) -static
+ 
+-rawtx_LDADD	= ../lib/libccoin0.la \
++rawtx_LDADD	= ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @ARGP_LIBS@ @JANSSON_LIBS@
+ #rawtx_LDFLAGS = $(AM_LDFLAGS) -static
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 2159fcd..d9bfb6f 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -31,7 +31,7 @@ TESTS		= clist cstr hex hdkeys hashtab base58 fileio util keyset bloom \
+ 		  message parr script-parse tx block blockfile blkdb script \
+ 		  tx-valid wallet wallet-basics chain-verf
+ 
+-COMMON_LDADD	= libtest.a ../lib/libccoin0.la \
++COMMON_LDADD	= libtest.a ../lib/libccoin.la \
+ 		  @CRYPTO_LIBS@ @GMP_LIBS@ @JANSSON_LIBS@ @MATH_LIBS@
+ 
+ base58_LDADD        = $(COMMON_LDADD)
