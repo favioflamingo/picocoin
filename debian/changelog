@@ -1,3 +1,40 @@
+picocoin (0.2-2~1.gbp06cc18) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @06cc189013b96320a88bacd0399c8246e2b1f871 **
+
+  [ Aido ]
+  * libsecp256k1: Add libsecp256k1 as a submodule
+  * travis: Simplify travis config
+  * configure.ac: Update configure.ac for libsecp256k1 submodule
+  * Makefile.am: Update Makefiles to include libsecp256k1 submodule
+
+  [ Duncan Tebbs ]
+  * configure.ac: explicitly include /usr/local libs (fixes build errors in latest xcode)
+  * ccoin: switch to secp256k1 lib for most key operations
+  * configure.ac: dont run secp256k1 tests by default
+
+  [ Aido ]
+  * configure.ac: Added subdir-objects to AM_INIT_AUTOMAKE
+  * secp256k1: Update to latest version of secp256k1
+  * configure.ac: Remove workaround for secp256k1 jni being enabled in distcheck
+  * ccoin: Add check for valid signature encoding
+  * ccoin: Move network functionality into it's own separate library
+  * ccoin: Implement BIP66 (SCRIPT_VERIFY_DERSIG)
+  * test: Update script tests
+  * ccoin: Added check for valid compressed or uncompressed public key
+  * test: Fix issue with use of empty strings in script test file This fixes #80 and fixes #81
+
+  [ Joel Manuel De Jesus ]
+  * fixing configure version number
+  * removing extra files
+  * removing .project file
+
+  [ Joel Manuel De Jesus ]
+  * changing operator names
+  * fixing configure.ac error
+
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Wed, 12 Apr 2017 08:21:09 +0900
+
 picocoin (0.2-1) jessie; urgency=medium
 
   [ Aido ]

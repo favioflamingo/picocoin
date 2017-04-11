@@ -1,3 +1,4 @@
 0001-adding-library-version-info.patch
 0002-appending-ccoin_-to-operator-names.patch
 0003-changed-OP-to-ccoin_OP.patch
+0004-fixing-soname-number.patch

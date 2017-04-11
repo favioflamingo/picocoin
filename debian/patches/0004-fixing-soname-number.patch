@@ -1,0 +1,21 @@
+From: Joel DeJesus <dejesus.joel@e-flamingo.jp>
+Date: Wed, 12 Apr 2017 08:20:29 +0900
+Subject: fixing soname number
+
+---
+ lib/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 7e125c7..c3e8633 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -43,7 +43,7 @@ libccoin_la_SOURCES=	\
+ 	utxo.c		\
+ 	wallet.c
+ # current:revision:age
+-libccoin_la_LDFLAGS = -module -shared  -version-info 0:2:1
++libccoin_la_LDFLAGS = -module -shared  -version-info 0:2:0
+ 
+ noinst_LTLIBRARIES= libccoinnet.la
+ 
