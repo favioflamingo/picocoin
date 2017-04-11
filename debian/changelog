@@ -1,3 +1,11 @@
+picocoin (0.1-3~1.gbp09edfb) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @09edfb05d545f018f869b479dd354baf6f6cd943 **
+
+  * UNRELEASED
+
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 14:58:59 +0900
+
 picocoin (0.1-2) jessie; urgency=low
 
   [ Joel Manuel De Jesus (Work Account) ]
