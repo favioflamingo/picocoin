@@ -17,33 +17,11 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * configure.ac: Added subdir-objects to AM_INIT_AUTOMAKE
   * secp256k1: Update to latest version of secp256k1
   * configure.ac: Remove workaround for secp256k1 jni being enabled in distcheck
-  * ccoin: Add check for valid signature encoding
-  * ccoin: Move network functionality into it's own separate library
-  * ccoin: Implement BIP66 (SCRIPT_VERIFY_DERSIG)
-  * test: Update script tests
-  * ccoin: Added check for valid compressed or uncompressed public key
-  * test: Fix issue with use of empty strings in script test file This fixes #80 and fixes #81
-
-  [ Joel Manuel De Jesus ]
-  * fixing configure version number
-  * removing extra files
-  * removing .project file
-
-  [ Joel Manuel De Jesus ]
-  * changing operator names
-  * fixing configure.ac error
 
   [ libbitc ]
   * ccoin: Added SCRIPT_VERIFY_LOW_S functionality
   * ccoin: Added IsDefinedHashtypeSignature functionality
   * ccoin: Added check for invalid use of SIGHASH_SINGLE
-  * test: Introduce verification flags to tx test files
-  * ccoin: Added SCRIPT_VERIFY_SIGPUSHONLY test flag
-  * ccoin: Added SCRIPT_VERIFY_MINIMALDATA test flag and checks
-  * ccoin: Added SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS test flag
-  * ccoin: Added SCRIPT_VERIFY_CLEANSTACK test flag
-  * ccoin: Added OP_CHECKLOCKTIMEVERIFY and tests
-  * ccoin: Added OP_CHECKSEQUENCEVERIFY and tests
 
   [ Aido ]
   * ccoin: Add a simple logging framework
@@ -64,28 +42,6 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * wallet fix: correct destructors for parr arrays
   * picocoin/wallet: Generate new addresses via HD derivation (BIP32/44)
   * lib/hdkeys: Add hd_derive() helper for building multi-segment HD paths
-  * wallet: Use hd_derive() when generating new addresses
-  * wallet: add HD key info to wallet-info command output
-  * blkstats, rawtx: trim trailing whitespace (cosmetic)
-  * picocoin: Add internal concept of accounts (BIP 44-style)
-  * picocoin: save and restore "default account" setting
-  * configure.ac: update jgarzik email address
-  * brd: eliminate unused var
-  * net: move static declarations out of public header file
-  * src/wallet: use RAND_bytes() for obtaining HD master seed
-  * picocoin: Rewrite command line processing to use argp
-  * test/tx-valid: remove unused (shadowed) var
-  * picocoin/wallet: Complete multi-account support
-  * picocoin: list-settings and --help cleanup
-  * README: update picocoin cmd line docs
-  * Remove remaining references to now-dead exmulti.com.
-  * README: indicate notable components
-  * Increase misc. test coverage.
-  * Increase file I/O, hashtab test coverage.
-  * Add simple keystore unit test
-  * Add simple test for mbr module.
-  * test/mbr: fix memory leak
-  * lib/wallet: remove duplicate code
   * Release version 0.5.
 
   [ Joel DeJesus ]
@@ -104,21 +60,7 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * travis: add coverity scan
   * travis: disable failing coverity cert request
   * include/ccoin/log.h: cosmetic - shorten macro lines to fit on one screen line
-  * lib/log: Add test. Use thread-safe functions and variables.
-  * [test] Add checkpoints test.  Move log test to new misc test module.
-  * lib/crypto/sha2: trim trailing whitespace
-  * [lib] Fix msg_addr mem bugs. Introduce "freep" convention for destructors.
-  * test/message: fix mem leak
-  * Normalize parr_* destructor conventions.  Fix a few bugs detected.
-  * travis: only scan upon commits to coverity_scan branch
-  * test: new network test
-  * Add crypto tests.  Use void* for passing binary data.
-  * lib/net/peerman: fix resource leak
-  * lib/wallet.c: BUG fix - correct HD master seed length
-  * lib/parr: fix resource leak on error
-  * lib/util.c: minor cleanups suggested by coverity
-  * lib/hdkeys: fix resource leak
-  * lib/key: coverity inspired cleanup and defensive programming
+
 
   [ libbitc ]
   * Makefile.am: Add pkg-deb make target for creating Debian packages
@@ -126,11 +68,6 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   [ Jeff Garzik ]
   * [test] cstr, parr: improve code coverage by testing edge cases
   * [lib] key and ext-key init need not return a value
-  * lib/address, src/rawtx, test/hdkeys: minor coverity-inspired fixes
-  * lib/key: sanitize inputs of privkey/pubkey_get()
-  * blkscan: pointer replication bug fix
-  * src/wallet: coverity-inspired wallet dump cleanup
-  * brd: fix leak-on-error
 
   [ libbitc ]
   * ccoin: Added SCRIPT_VERIFY_NULLDUMMY test flag and script tests
@@ -138,9 +75,6 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   [ Aido ]
   * crypto: AES utility tidy up
   * travis: Remove time consuming 'brew update' command 'brew update' was added as part of #83 to fix a glibtoolize error and failing OSX build. Travis now defaults to a more recent version of OSX containing the newer working version of glibtoolize.
-  * travis: Change Valgrind and Coverage builds to use just a single job slot Valgrind and Coverage were previously using 'make -j3'
-  * travis: Upgrade to XCode 8 for OSX builds Fixes Valgrind issue with clist
-  * crypto: Replace all instances of OpenSSL RAND_bytes with an implementation of Fortuna PRNG
 
   [ libbitc ]
   * ccoin: Fix failing CSV tests
@@ -150,8 +84,6 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * updating soname
   * updating patches to upstream HEAD
   * readding debian control files
-
-  [ Joel De Jesus ]
 
  -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Wed, 12 Apr 2017 08:21:09 +0900
 
@@ -172,12 +104,6 @@ picocoin (0.2-1) jessie; urgency=medium
   * configure.ac: Added subdir-objects to AM_INIT_AUTOMAKE
   * secp256k1: Update to latest version of secp256k1
   * configure.ac: Remove workaround for secp256k1 jni being enabled in distcheck
-  * ccoin: Add check for valid signature encoding
-  * ccoin: Move network functionality into it's own separate library
-  * ccoin: Implement BIP66 (SCRIPT_VERIFY_DERSIG)
-  * test: Update script tests
-  * ccoin: Added check for valid compressed or uncompressed public key
-  * test: Fix issue with use of empty strings in script test file This fixes #80 and fixes #81
 
   [ Joel Manuel De Jesus ]
   * fixing configure version number
@@ -194,11 +120,7 @@ picocoin (0.1-4) jessie; urgency=low
 
   [ Joel Manuel De Jesus (Work Account) ]
   * incrementing soname and version
-
-  [ Joel Manuel De Jesus (Work Account) ]
   * adding more lib fixes
-
-  [ Joel Manuel De Jesus (Work Account) ]
   * undoing library name change
 
  -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Tue, 11 Apr 2017 19:21:57 +0900
