@@ -1,0 +1,1794 @@
+From: Joel DeJesus <dejesus.joel@e-flamingo.jp>
+Date: Wed, 12 Apr 2017 12:28:00 +0900
+Subject: appending ccoin_ to operator names
+
+---
+ include/ccoin/script.h | 252 +++++++++++++++++++++----------------------
+ lib/script.c           |  60 +++++------
+ lib/script_eval.c      | 282 ++++++++++++++++++++++++-------------------------
+ lib/script_names.c     | 260 ++++++++++++++++++++++-----------------------
+ src/blkstats.c         |   4 +-
+ test/libtest.c         |   2 +-
+ test/script-parse.c    |   6 +-
+ test/script_tests.json | 124 +++++++++++-----------
+ test/tx_invalid.json   |   2 +-
+ test/tx_valid.json     |  20 ++--
+ 10 files changed, 506 insertions(+), 506 deletions(-)
+
+diff --git a/include/ccoin/script.h b/include/ccoin/script.h
+index afdcec7..951b184 100644
+--- a/include/ccoin/script.h
++++ b/include/ccoin/script.h
+@@ -76,148 +76,148 @@ enum txnouttype
+ enum opcodetype
+ {
+ 	// push value
+-	OP_0 = 0x00,
+-	OP_FALSE = OP_0,
+-	OP_PUSHDATA1 = 0x4c,
+-	OP_PUSHDATA2 = 0x4d,
+-	OP_PUSHDATA4 = 0x4e,
+-	OP_1NEGATE = 0x4f,
+-	OP_RESERVED = 0x50,
+-	OP_1 = 0x51,
+-	OP_TRUE=OP_1,
+-	OP_2 = 0x52,
+-	OP_3 = 0x53,
+-	OP_4 = 0x54,
+-	OP_5 = 0x55,
+-	OP_6 = 0x56,
+-	OP_7 = 0x57,
+-	OP_8 = 0x58,
+-	OP_9 = 0x59,
+-	OP_10 = 0x5a,
+-	OP_11 = 0x5b,
+-	OP_12 = 0x5c,
+-	OP_13 = 0x5d,
+-	OP_14 = 0x5e,
+-	OP_15 = 0x5f,
+-	OP_16 = 0x60,
++	ccoin_OP_0 = 0x00,
++	ccoin_OP_FALSE = ccoin_OP_0,
++	ccoin_OP_PUSHDATA1 = 0x4c,
++	ccoin_OP_PUSHDATA2 = 0x4d,
++	ccoin_OP_PUSHDATA4 = 0x4e,
++	ccoin_OP_1NEGATE = 0x4f,
++	ccoin_OP_RESERVED = 0x50,
++	ccoin_OP_1 = 0x51,
++	ccoin_OP_TRUE=ccoin_OP_1,
++	ccoin_OP_2 = 0x52,
++	ccoin_OP_3 = 0x53,
++	ccoin_OP_4 = 0x54,
++	ccoin_OP_5 = 0x55,
++	ccoin_OP_6 = 0x56,
++	ccoin_OP_7 = 0x57,
++	ccoin_OP_8 = 0x58,
++	ccoin_OP_9 = 0x59,
++	ccoin_OP_10 = 0x5a,
++	ccoin_OP_11 = 0x5b,
++	ccoin_OP_12 = 0x5c,
++	ccoin_OP_13 = 0x5d,
++	ccoin_OP_14 = 0x5e,
++	ccoin_OP_15 = 0x5f,
++	ccoin_OP_16 = 0x60,
+ 
+ 	// control
+-	OP_NOP = 0x61,
+-	OP_VER = 0x62,
+-	OP_IF = 0x63,
+-	OP_NOTIF = 0x64,
+-	OP_VERIF = 0x65,
+-	OP_VERNOTIF = 0x66,
+-	OP_ELSE = 0x67,
+-	OP_ENDIF = 0x68,
+-	OP_VERIFY = 0x69,
+-	OP_RETURN = 0x6a,
++	ccoin_OP_NOP = 0x61,
++	ccoin_OP_VER = 0x62,
++	ccoin_OP_IF = 0x63,
++	ccoin_OP_NOTIF = 0x64,
++	ccoin_OP_VERIF = 0x65,
++	ccoin_OP_VERNOTIF = 0x66,
++	ccoin_OP_ELSE = 0x67,
++	ccoin_OP_ENDIF = 0x68,
++	ccoin_OP_VERIFY = 0x69,
++	ccoin_OP_RETURN = 0x6a,
+ 
+ 	// stack ops
+-	OP_TOALTSTACK = 0x6b,
+-	OP_FROMALTSTACK = 0x6c,
+-	OP_2DROP = 0x6d,
+-	OP_2DUP = 0x6e,
+-	OP_3DUP = 0x6f,
+-	OP_2OVER = 0x70,
+-	OP_2ROT = 0x71,
+-	OP_2SWAP = 0x72,
+-	OP_IFDUP = 0x73,
+-	OP_DEPTH = 0x74,
+-	OP_DROP = 0x75,
+-	OP_DUP = 0x76,
+-	OP_NIP = 0x77,
+-	OP_OVER = 0x78,
+-	OP_PICK = 0x79,
+-	OP_ROLL = 0x7a,
+-	OP_ROT = 0x7b,
+-	OP_SWAP = 0x7c,
+-	OP_TUCK = 0x7d,
++	ccoin_OP_TOALTSTACK = 0x6b,
++	ccoin_OP_FROMALTSTACK = 0x6c,
++	ccoin_OP_2DROP = 0x6d,
++	ccoin_OP_2DUP = 0x6e,
++	ccoin_OP_3DUP = 0x6f,
++	ccoin_OP_2OVER = 0x70,
++	ccoin_OP_2ROT = 0x71,
++	ccoin_OP_2SWAP = 0x72,
++	ccoin_OP_IFDUP = 0x73,
++	ccoin_OP_DEPTH = 0x74,
++	ccoin_OP_DROP = 0x75,
++	ccoin_OP_DUP = 0x76,
++	ccoin_OP_NIP = 0x77,
++	ccoin_OP_OVER = 0x78,
++	ccoin_OP_PICK = 0x79,
++	ccoin_OP_ROLL = 0x7a,
++	ccoin_OP_ROT = 0x7b,
++	ccoin_OP_SWAP = 0x7c,
++	ccoin_OP_TUCK = 0x7d,
+ 
+ 	// splice ops
+-	OP_CAT = 0x7e,
+-	OP_SUBSTR = 0x7f,
+-	OP_LEFT = 0x80,
+-	OP_RIGHT = 0x81,
+-	OP_SIZE = 0x82,
++	ccoin_OP_CAT = 0x7e,
++	ccoin_OP_SUBSTR = 0x7f,
++	ccoin_OP_LEFT = 0x80,
++	ccoin_OP_RIGHT = 0x81,
++	ccoin_OP_SIZE = 0x82,
+ 
+ 	// bit logic
+-	OP_INVERT = 0x83,
+-	OP_AND = 0x84,
+-	OP_OR = 0x85,
+-	OP_XOR = 0x86,
+-	OP_EQUAL = 0x87,
+-	OP_EQUALVERIFY = 0x88,
+-	OP_RESERVED1 = 0x89,
+-	OP_RESERVED2 = 0x8a,
++	ccoin_OP_INVERT = 0x83,
++	ccoin_OP_AND = 0x84,
++	ccoin_OP_OR = 0x85,
++	ccoin_OP_XOR = 0x86,
++	ccoin_OP_EQUAL = 0x87,
++	ccoin_OP_EQUALVERIFY = 0x88,
++	ccoin_OP_RESERVED1 = 0x89,
++	ccoin_OP_RESERVED2 = 0x8a,
+ 
+ 	// numeric
+-	OP_1ADD = 0x8b,
+-	OP_1SUB = 0x8c,
+-	OP_2MUL = 0x8d,
+-	OP_2DIV = 0x8e,
+-	OP_NEGATE = 0x8f,
+-	OP_ABS = 0x90,
+-	OP_NOT = 0x91,
+-	OP_0NOTEQUAL = 0x92,
+-
+-	OP_ADD = 0x93,
+-	OP_SUB = 0x94,
+-	OP_MUL = 0x95,
+-	OP_DIV = 0x96,
+-	OP_MOD = 0x97,
+-	OP_LSHIFT = 0x98,
+-	OP_RSHIFT = 0x99,
+-
+-	OP_BOOLAND = 0x9a,
+-	OP_BOOLOR = 0x9b,
+-	OP_NUMEQUAL = 0x9c,
+-	OP_NUMEQUALVERIFY = 0x9d,
+-	OP_NUMNOTEQUAL = 0x9e,
+-	OP_LESSTHAN = 0x9f,
+-	OP_GREATERTHAN = 0xa0,
+-	OP_LESSTHANOREQUAL = 0xa1,
+-	OP_GREATERTHANOREQUAL = 0xa2,
+-	OP_MIN = 0xa3,
+-	OP_MAX = 0xa4,
+-
+-	OP_WITHIN = 0xa5,
++	ccoin_OP_1ADD = 0x8b,
++	ccoin_OP_1SUB = 0x8c,
++	ccoin_OP_2MUL = 0x8d,
++	ccoin_OP_2DIV = 0x8e,
++	ccoin_OP_NEGATE = 0x8f,
++	ccoin_OP_ABS = 0x90,
++	ccoin_OP_NOT = 0x91,
++	ccoin_OP_0NOTEQUAL = 0x92,
++
++	ccoin_OP_ADD = 0x93,
++	ccoin_OP_SUB = 0x94,
++	ccoin_OP_MUL = 0x95,
++	ccoin_OP_DIV = 0x96,
++	ccoin_OP_MOD = 0x97,
++	ccoin_OP_LSHIFT = 0x98,
++	ccoin_OP_RSHIFT = 0x99,
++
++	ccoin_OP_BOOLAND = 0x9a,
++	ccoin_OP_BOOLOR = 0x9b,
++	ccoin_OP_NUMEQUAL = 0x9c,
++	ccoin_OP_NUMEQUALVERIFY = 0x9d,
++	ccoin_OP_NUMNOTEQUAL = 0x9e,
++	ccoin_OP_LESSTHAN = 0x9f,
++	ccoin_OP_GREATERTHAN = 0xa0,
++	ccoin_OP_LESSTHANOREQUAL = 0xa1,
++	ccoin_OP_GREATERTHANOREQUAL = 0xa2,
++	ccoin_OP_MIN = 0xa3,
++	ccoin_OP_MAX = 0xa4,
++
++	ccoin_OP_WITHIN = 0xa5,
+ 
+ 	// crypto
+-	OP_RIPEMD160 = 0xa6,
+-	OP_SHA1 = 0xa7,
+-	OP_SHA256 = 0xa8,
+-	OP_HASH160 = 0xa9,
+-	OP_HASH256 = 0xaa,
+-	OP_CODESEPARATOR = 0xab,
+-	OP_CHECKSIG = 0xac,
+-	OP_CHECKSIGVERIFY = 0xad,
+-	OP_CHECKMULTISIG = 0xae,
+-	OP_CHECKMULTISIGVERIFY = 0xaf,
++	ccoin_OP_RIPEMD160 = 0xa6,
++	ccoin_OP_SHA1 = 0xa7,
++	ccoin_OP_SHA256 = 0xa8,
++	ccoin_OP_HASH160 = 0xa9,
++	ccoin_OP_HASH256 = 0xaa,
++	ccoin_OP_CODESEPARATOR = 0xab,
++	ccoin_OP_CHECKSIG = 0xac,
++	ccoin_OP_CHECKSIGVERIFY = 0xad,
++	ccoin_OP_CHECKMULTISIG = 0xae,
++	ccoin_OP_CHECKMULTISIGVERIFY = 0xaf,
+ 
+ 	// expansion
+-	OP_NOP1 = 0xb0,
+-	OP_CHECKLOCKTIMEVERIFY = 0xb1,
+-	OP_NOP2 = OP_CHECKLOCKTIMEVERIFY,
+-	OP_CHECKSEQUENCEVERIFY = 0xb2,
+-	OP_NOP3 = OP_CHECKSEQUENCEVERIFY,
+-	OP_NOP4 = 0xb3,
+-	OP_NOP5 = 0xb4,
+-	OP_NOP6 = 0xb5,
+-	OP_NOP7 = 0xb6,
+-	OP_NOP8 = 0xb7,
+-	OP_NOP9 = 0xb8,
+-	OP_NOP10 = 0xb9,
++	ccoin_OP_NOP1 = 0xb0,
++	ccoin_OP_CHECKLOCKTIMEVERIFY = 0xb1,
++	ccoin_OP_NOP2 = ccoin_OP_CHECKLOCKTIMEVERIFY,
++	ccoin_OP_CHECKSEQUENCEVERIFY = 0xb2,
++	ccoin_OP_NOP3 = ccoin_OP_CHECKSEQUENCEVERIFY,
++	ccoin_OP_NOP4 = 0xb3,
++	ccoin_OP_NOP5 = 0xb4,
++	ccoin_OP_NOP6 = 0xb5,
++	ccoin_OP_NOP7 = 0xb6,
++	ccoin_OP_NOP8 = 0xb7,
++	ccoin_OP_NOP9 = 0xb8,
++	ccoin_OP_NOP10 = 0xb9,
+ 
+ 
+ 
+ 	// template matching params
+-	OP_SMALLINTEGER = 0xfa,
+-	OP_PUBKEYS = 0xfb,
+-	OP_PUBKEYHASH = 0xfd,
+-	OP_PUBKEY = 0xfe,
++	ccoin_OP_SMALLINTEGER = 0xfa,
++	ccoin_OP_PUBKEYS = 0xfb,
++	ccoin_OP_PUBKEYHASH = 0xfd,
++	ccoin_OP_PUBKEY = 0xfe,
+ 
+-	OP_INVALIDOPCODE = 0xff,
++	ccoin_OP_INVALIDOPCODE = 0xff,
+ };
+ 
+ struct bscript_parser {
+@@ -258,16 +258,16 @@ extern bool is_bsp_multisig(parr *ops);
+ 
+ static inline bool is_bsp_pushdata(enum opcodetype op)
+ {
+-	return (op <= OP_PUSHDATA4);
++	return (op <= ccoin_OP_PUSHDATA4);
+ }
+ 
+ static inline bool is_bsp_p2sh(struct const_buffer *buf)
+ {
+ 	const unsigned char *vch = (const unsigned char *)(buf->p);
+ 	return	(buf->len == 23 &&
+-		 vch[0] == OP_HASH160 &&
++		 vch[0] == ccoin_OP_HASH160 &&
+ 		 vch[1] == 0x14 &&
+-		 vch[22] == OP_EQUAL);
++		 vch[22] == ccoin_OP_EQUAL);
+ }
+ 
+ static inline bool is_bsp_p2sh_str(const cstring *s)
+diff --git a/lib/script.c b/lib/script.c
+index e30c203..336ae62 100644
+--- a/lib/script.c
++++ b/lib/script.c
+@@ -23,22 +23,22 @@ bool bsp_getop(struct bscript_op *op, struct bscript_parser *bp)
+ 
+ 	uint32_t data_len;
+ 
+-	if (opcode < OP_PUSHDATA1)
++	if (opcode < ccoin_OP_PUSHDATA1)
+ 		data_len = opcode;
+ 
+-	else if (opcode == OP_PUSHDATA1) {
++	else if (opcode == ccoin_OP_PUSHDATA1) {
+ 		uint8_t v8;
+ 		if (!deser_bytes(&v8, bp->buf, 1))
+ 			goto err_out;
+ 		data_len = v8;
+ 	}
+-	else if (opcode == OP_PUSHDATA2) {
++	else if (opcode == ccoin_OP_PUSHDATA2) {
+ 		uint16_t v16;
+ 		if (!deser_u16(&v16, bp->buf))
+ 			goto err_out;
+ 		data_len = v16;
+ 	}
+-	else if (opcode == OP_PUSHDATA4) {
++	else if (opcode == ccoin_OP_PUSHDATA4) {
+ 		uint32_t v32;
+ 		if (!deser_u32(&v32, bp->buf))
+ 			goto err_out;
+@@ -107,8 +107,8 @@ static bool is_bsp_op(const struct bscript_op *op, enum opcodetype opcode)
+ 
+ static bool is_bsp_op_smallint(const struct bscript_op *op)
+ {
+-	return ((op->op == OP_0) ||
+-		(op->op >= OP_1 && op->op <= OP_16));
++	return ((op->op == ccoin_OP_0) ||
++		(op->op >= ccoin_OP_1 && op->op <= ccoin_OP_16));
+ }
+ 
+ static bool is_bsp_op_pubkey(const struct bscript_op *op)
+@@ -129,41 +129,41 @@ static bool is_bsp_op_pubkeyhash(const struct bscript_op *op)
+ 	return true;
+ }
+ 
+-// OP_PUBKEY, OP_CHECKSIG
++// ccoin_OP_PUBKEY, ccoin_OP_CHECKSIG
+ bool is_bsp_pubkey(parr *ops)
+ {
+ 	return ((ops->len == 2) &&
+-	        is_bsp_op(parr_idx(ops, 1), OP_CHECKSIG) &&
++	        is_bsp_op(parr_idx(ops, 1), ccoin_OP_CHECKSIG) &&
+ 	        is_bsp_op_pubkey(parr_idx(ops, 0)));
+ }
+ 
+-// OP_DUP, OP_HASH160, OP_PUBKEYHASH, OP_EQUALVERIFY, OP_CHECKSIG,
++// ccoin_OP_DUP, ccoin_OP_HASH160, ccoin_OP_PUBKEYHASH, ccoin_OP_EQUALVERIFY, ccoin_OP_CHECKSIG,
+ bool is_bsp_pubkeyhash(parr *ops)
+ {
+ 	return ((ops->len == 5) &&
+-	        is_bsp_op(parr_idx(ops, 0), OP_DUP) &&
+-	        is_bsp_op(parr_idx(ops, 1), OP_HASH160) &&
++	        is_bsp_op(parr_idx(ops, 0), ccoin_OP_DUP) &&
++	        is_bsp_op(parr_idx(ops, 1), ccoin_OP_HASH160) &&
+ 	        is_bsp_op_pubkeyhash(parr_idx(ops, 2)) &&
+-	        is_bsp_op(parr_idx(ops, 3), OP_EQUALVERIFY) &&
+-	        is_bsp_op(parr_idx(ops, 4), OP_CHECKSIG));
++	        is_bsp_op(parr_idx(ops, 3), ccoin_OP_EQUALVERIFY) &&
++	        is_bsp_op(parr_idx(ops, 4), ccoin_OP_CHECKSIG));
+ }
+ 
+-// OP_HASH160, OP_PUBKEYHASH, OP_EQUAL
++// ccoin_OP_HASH160, ccoin_OP_PUBKEYHASH, ccoin_OP_EQUAL
+ bool is_bsp_scripthash(parr *ops)
+ {
+ 	return ((ops->len == 3) &&
+-	        is_bsp_op(parr_idx(ops, 0), OP_HASH160) &&
++	        is_bsp_op(parr_idx(ops, 0), ccoin_OP_HASH160) &&
+ 	        is_bsp_op_pubkeyhash(parr_idx(ops, 1)) &&
+-	        is_bsp_op(parr_idx(ops, 2), OP_EQUAL));
++	        is_bsp_op(parr_idx(ops, 2), ccoin_OP_EQUAL));
+ }
+ 
+-// OP_SMALLINTEGER, OP_PUBKEYS, OP_SMALLINTEGER, OP_CHECKMULTISIG
++// ccoin_OP_SMALLINTEGER, ccoin_OP_PUBKEYS, ccoin_OP_SMALLINTEGER, ccoin_OP_CHECKMULTISIG
+ bool is_bsp_multisig(parr *ops)
+ {
+ 	if ((ops->len < 3) || (ops->len > (16 + 3)) ||
+ 	    !is_bsp_op_smallint(parr_idx(ops, 0)) ||
+ 	    !is_bsp_op_smallint(parr_idx(ops, ops->len - 2)) ||
+-	    !is_bsp_op(parr_idx(ops, ops->len - 1), OP_CHECKMULTISIG))
++	    !is_bsp_op(parr_idx(ops, ops->len - 1), ccoin_OP_CHECKMULTISIG))
+ 		return false;
+ 
+ 	unsigned int i;
+@@ -242,14 +242,14 @@ void bsp_addr_free(struct bscript_addr *addrs)
+ 
+ void bsp_push_data(cstring *s, const void *data, size_t data_len)
+ {
+-	if (data_len < OP_PUSHDATA1) {
++	if (data_len < ccoin_OP_PUSHDATA1) {
+ 		uint8_t c = (uint8_t) data_len;
+ 
+ 		cstr_append_buf(s, &c, sizeof(c));
+ 	}
+ 
+ 	else if (data_len <= 0xff) {
+-		uint8_t opcode = OP_PUSHDATA1;
++		uint8_t opcode = ccoin_OP_PUSHDATA1;
+ 		uint8_t v8 = (uint8_t) data_len;
+ 
+ 		cstr_append_buf(s, &opcode, sizeof(opcode));
+@@ -257,7 +257,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
+ 	}
+ 
+ 	else if (data_len <= 0xffff) {
+-		uint8_t opcode = OP_PUSHDATA2;
++		uint8_t opcode = ccoin_OP_PUSHDATA2;
+ 		uint16_t v16_le = htole16((uint16_t) data_len);
+ 
+ 		cstr_append_buf(s, &opcode, sizeof(opcode));
+@@ -265,7 +265,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
+ 	}
+ 
+ 	else {
+-		uint8_t opcode = OP_PUSHDATA4;
++		uint8_t opcode = ccoin_OP_PUSHDATA4;
+ 		uint32_t v32_le = htole32((uint32_t) data_len);
+ 
+ 		cstr_append_buf(s, &opcode, sizeof(opcode));
+@@ -278,7 +278,7 @@ void bsp_push_data(cstring *s, const void *data, size_t data_len)
+ void bsp_push_int64(cstring *s, int64_t n)
+ {
+ 	if (n == -1 || (n >= 1 && n <= 16)) {
+-		unsigned char c = (unsigned char) (n + (OP_1 - 1));
++		unsigned char c = (unsigned char) (n + (ccoin_OP_1 - 1));
+ 		cstr_append_buf(s, &c, 1);
+ 		return;
+ 	}
+@@ -312,7 +312,7 @@ void bsp_push_int64(cstring *s, int64_t n)
+ void bsp_push_uint64(cstring *s, uint64_t n)
+ {
+ 	if (n >= 1 && n <= 16) {
+-		unsigned char c = (unsigned char) (n + (OP_1 - 1));
++		unsigned char c = (unsigned char) (n + (ccoin_OP_1 - 1));
+ 		cstr_append_buf(s, &c, 1);
+ 		return;
+ 	}
+@@ -339,9 +339,9 @@ cstring *bsp_make_scripthash(cstring *hash)
+ {
+ 	cstring *script_out = cstr_new_sz(32);
+ 
+-	bsp_push_op(script_out, OP_HASH160);
++	bsp_push_op(script_out, ccoin_OP_HASH160);
+ 	bsp_push_data(script_out, hash->str, hash->len);
+-	bsp_push_op(script_out, OP_EQUAL);
++	bsp_push_op(script_out, ccoin_OP_EQUAL);
+ 
+ 	return script_out;
+ }
+@@ -350,11 +350,11 @@ cstring *bsp_make_pubkeyhash(cstring *hash)
+ {
+ 	cstring *script_out = cstr_new_sz(32);
+ 
+-	bsp_push_op(script_out, OP_DUP);
+-	bsp_push_op(script_out, OP_HASH160);
++	bsp_push_op(script_out, ccoin_OP_DUP);
++	bsp_push_op(script_out, ccoin_OP_HASH160);
+ 	bsp_push_data(script_out, hash->str, hash->len);
+-	bsp_push_op(script_out, OP_EQUALVERIFY);
+-	bsp_push_op(script_out, OP_CHECKSIG);
++	bsp_push_op(script_out, ccoin_OP_EQUALVERIFY);
++	bsp_push_op(script_out, ccoin_OP_CHECKSIG);
+ 
+ 	return script_out;
+ }
+diff --git a/lib/script_eval.c b/lib/script_eval.c
+index 33f2e76..993a62a 100644
+--- a/lib/script_eval.c
++++ b/lib/script_eval.c
+@@ -74,7 +74,7 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
+ 	bp_tx_init(&txTmp);
+ 	bp_tx_copy(&txTmp, txTo);
+ 
+-	/* TODO: find-and-delete OP_CODESEPARATOR from scriptCode */
++	/* TODO: find-and-delete ccoin_OP_CODESEPARATOR from scriptCode */
+ 
+ 	/* Blank out other inputs' signatures */
+ 	unsigned int i;
+@@ -143,21 +143,21 @@ out:
+ }
+ 
+ static const unsigned char disabled_op[256] = {
+-	[OP_CAT] = 1,
+-	[OP_SUBSTR] = 1,
+-	[OP_LEFT] = 1,
+-	[OP_RIGHT] = 1,
+-	[OP_INVERT] = 1,
+-	[OP_AND] = 1,
+-	[OP_OR] = 1,
+-	[OP_XOR] = 1,
+-	[OP_2MUL] = 1,
+-	[OP_2DIV] = 1,
+-	[OP_MUL] = 1,
+-	[OP_DIV] = 1,
+-	[OP_MOD] = 1,
+-	[OP_LSHIFT] = 1,
+-	[OP_RSHIFT] = 1,
++	[ccoin_OP_CAT] = 1,
++	[ccoin_OP_SUBSTR] = 1,
++	[ccoin_OP_LEFT] = 1,
++	[ccoin_OP_RIGHT] = 1,
++	[ccoin_OP_INVERT] = 1,
++	[ccoin_OP_AND] = 1,
++	[ccoin_OP_OR] = 1,
++	[ccoin_OP_XOR] = 1,
++	[ccoin_OP_2MUL] = 1,
++	[ccoin_OP_2DIV] = 1,
++	[ccoin_OP_MUL] = 1,
++	[ccoin_OP_DIV] = 1,
++	[ccoin_OP_MOD] = 1,
++	[ccoin_OP_LSHIFT] = 1,
++	[ccoin_OP_RSHIFT] = 1,
+ };
+ 
+ static bool CastToBigNum(mpz_t vo, const struct buffer *buf, bool fRequireMinimal, const size_t nMaxNumSize)
+@@ -479,23 +479,23 @@ bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode)
+ 	const unsigned char *vch = data->p;
+ 
+ 	if (data->len == 0) {
+-		// Could have used OP_0.
+-		return opcode == OP_0;
++		// Could have used ccoin_OP_0.
++		return opcode == ccoin_OP_0;
+ 	} else if (data->len == 1 && vch[0] >= 1 && vch[0] <= 16) {
+-		// Could have used OP_1 .. OP_16.
+-		return opcode == OP_1 + (vch[0] - 1);
++		// Could have used ccoin_OP_1 .. ccoin_OP_16.
++		return opcode == ccoin_OP_1 + (vch[0] - 1);
+ 	} else if (data->len == 1 && vch[0] == 0x81) {
+-		// Could have used OP_1NEGATE.
+-		return opcode == OP_1NEGATE;
++		// Could have used ccoin_OP_1NEGATE.
++		return opcode == ccoin_OP_1NEGATE;
+ 	} else if (data->len <= 75) {
+ 		// Could have used a direct push (opcode indicating number of bytes pushed + those bytes).
+ 		return opcode == data->len;
+ 	} else if (data->len <= 255) {
+-		// Could have used OP_PUSHDATA.
+-		return opcode == OP_PUSHDATA1;
++		// Could have used ccoin_OP_PUSHDATA.
++		return opcode == ccoin_OP_PUSHDATA1;
+ 	} else if (data->len <= 65535) {
+-		// Could have used OP_PUSHDATA2.
+-		return opcode == OP_PUSHDATA2;
++		// Could have used ccoin_OP_PUSHDATA2.
++		return opcode == ccoin_OP_PUSHDATA2;
+ 	}
+     return true;
+ }
+@@ -618,7 +618,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 
+ 		if (op.data.len > MAX_SCRIPT_ELEMENT_SIZE)
+ 			goto out;
+-		if (opcode > OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
++		if (opcode > ccoin_OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
+ 			goto out;
+ 		if (disabled_op[opcode])
+ 			goto out;
+@@ -627,40 +627,40 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
+ 				goto out;
+ 			stack_push(stack, (struct buffer *) &op.data);
+-		} else if (fExec || (OP_IF <= opcode && opcode <= OP_ENDIF))
++		} else if (fExec || (ccoin_OP_IF <= opcode && opcode <= ccoin_OP_ENDIF))
+ 		switch (opcode) {
+ 
+ 		//
+ 		// Push value
+ 		//
+-		case OP_1NEGATE:
+-		case OP_1:
+-		case OP_2:
+-		case OP_3:
+-		case OP_4:
+-		case OP_5:
+-		case OP_6:
+-		case OP_7:
+-		case OP_8:
+-		case OP_9:
+-		case OP_10:
+-		case OP_11:
+-		case OP_12:
+-		case OP_13:
+-		case OP_14:
+-		case OP_15:
+-		case OP_16:
+-			mpz_set_si(bn, (int)opcode - (int)(OP_1 - 1));
++		case ccoin_OP_1NEGATE:
++		case ccoin_OP_1:
++		case ccoin_OP_2:
++		case ccoin_OP_3:
++		case ccoin_OP_4:
++		case ccoin_OP_5:
++		case ccoin_OP_6:
++		case ccoin_OP_7:
++		case ccoin_OP_8:
++		case ccoin_OP_9:
++		case ccoin_OP_10:
++		case ccoin_OP_11:
++		case ccoin_OP_12:
++		case ccoin_OP_13:
++		case ccoin_OP_14:
++		case ccoin_OP_15:
++		case ccoin_OP_16:
++			mpz_set_si(bn, (int)opcode - (int)(ccoin_OP_1 - 1));
+ 			stack_push_str(stack, bn_getvch(bn));
+ 			break;
+ 
+ 		//
+ 		// Control
+ 		//
+-		case OP_NOP:
++		case ccoin_OP_NOP:
+ 			break;
+ 
+-		case OP_CHECKLOCKTIMEVERIFY: {
++		case ccoin_OP_CHECKLOCKTIMEVERIFY: {
+ 			if (!(flags & SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY)) {
+ 				// not enabled; treat as a NOP2
+ 				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
+@@ -704,7 +704,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_CHECKSEQUENCEVERIFY:
++		case ccoin_OP_CHECKSEQUENCEVERIFY:
+ 		{
+ 			if (!(flags & SCRIPT_VERIFY_CHECKSEQUENCEVERIFY)) {
+ 				// not enabled; treat as a NOP3
+@@ -743,14 +743,14 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_NOP1: case OP_NOP4: case OP_NOP5:
+-		case OP_NOP6: case OP_NOP7: case OP_NOP8: case OP_NOP9: case OP_NOP10:
++		case ccoin_OP_NOP1: case ccoin_OP_NOP4: case ccoin_OP_NOP5:
++		case ccoin_OP_NOP6: case ccoin_OP_NOP7: case ccoin_OP_NOP8: case ccoin_OP_NOP9: case ccoin_OP_NOP10:
+ 			if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
+ 				goto out;
+ 			break;
+ 
+-		case OP_IF:
+-		case OP_NOTIF: {
++		case ccoin_OP_IF:
++		case ccoin_OP_NOTIF: {
+ 			// <expression> if [statements] [else [statements]] endif
+ 			bool fValue = false;
+ 			if (fExec) {
+@@ -758,7 +758,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 					goto out;
+ 				struct buffer *vch = stacktop(stack, -1);
+ 				fValue = CastToBool(vch);
+-				if (opcode == OP_NOTIF)
++				if (opcode == ccoin_OP_NOTIF)
+ 					fValue = !fValue;
+ 				popstack(stack);
+ 			}
+@@ -767,7 +767,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_ELSE: {
++		case ccoin_OP_ELSE: {
+ 			if (vfExec->len == 0)
+ 				goto out;
+ 			uint8_t *v = (uint8_t *) &vfExec->str[vfExec->len - 1];
+@@ -775,13 +775,13 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_ENDIF:
++		case ccoin_OP_ENDIF:
+ 			if (vfExec->len == 0)
+ 				goto out;
+ 			cstr_erase(vfExec, vfExec->len - 1, 1);
+ 			break;
+ 
+-		case OP_VERIFY: {
++		case ccoin_OP_VERIFY: {
+ 			if (stack->len < 1)
+ 				goto out;
+ 			bool fValue = CastToBool(stacktop(stack, -1));
+@@ -792,27 +792,27 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_RETURN:
++		case ccoin_OP_RETURN:
+ 			goto out;
+ 
+ 		//
+ 		// Stack ops
+ 		//
+-		case OP_TOALTSTACK:
++		case ccoin_OP_TOALTSTACK:
+ 			if (stack->len < 1)
+ 				goto out;
+ 			stack_push(altstack, stacktop(stack, -1));
+ 			popstack(stack);
+ 			break;
+ 
+-		case OP_FROMALTSTACK:
++		case ccoin_OP_FROMALTSTACK:
+ 			if (altstack->len < 1)
+ 				goto out;
+ 			stack_push(stack, stacktop(altstack, -1));
+ 			popstack(altstack);
+ 			break;
+ 
+-		case OP_2DROP:
++		case ccoin_OP_2DROP:
+ 			// (x1 x2 -- )
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -820,7 +820,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			popstack(stack);
+ 			break;
+ 
+-		case OP_2DUP: {
++		case ccoin_OP_2DUP: {
+ 			// (x1 x2 -- x1 x2 x1 x2)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -831,7 +831,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_3DUP: {
++		case ccoin_OP_3DUP: {
+ 			// (x1 x2 x3 -- x1 x2 x3 x1 x2 x3)
+ 			if (stack->len < 3)
+ 				goto out;
+@@ -844,7 +844,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_2OVER: {
++		case ccoin_OP_2OVER: {
+ 			// (x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2)
+ 			if (stack->len < 4)
+ 				goto out;
+@@ -855,7 +855,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_2ROT: {
++		case ccoin_OP_2ROT: {
+ 			// (x1 x2 x3 x4 x5 x6 -- x3 x4 x5 x6 x1 x2)
+ 			if (stack->len < 6)
+ 				goto out;
+@@ -867,7 +867,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_2SWAP:
++		case ccoin_OP_2SWAP:
+ 			// (x1 x2 x3 x4 -- x3 x4 x1 x2)
+ 			if (stack->len < 4)
+ 				goto out;
+@@ -875,7 +875,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			stack_swap(stack, -3, -1);
+ 			break;
+ 
+-		case OP_IFDUP: {
++		case ccoin_OP_IFDUP: {
+ 			// (x - 0 | x x)
+ 			if (stack->len < 1)
+ 				goto out;
+@@ -885,20 +885,20 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_DEPTH:
++		case ccoin_OP_DEPTH:
+ 			// -- stacksize
+ 			mpz_set_ui(bn, stack->len);
+ 			stack_push_str(stack, bn_getvch(bn));
+ 			break;
+ 
+-		case OP_DROP:
++		case ccoin_OP_DROP:
+ 			// (x -- )
+ 			if (stack->len < 1)
+ 				goto out;
+ 			popstack(stack);
+ 			break;
+ 
+-		case OP_DUP: {
++		case ccoin_OP_DUP: {
+ 			// (x -- x x)
+ 			if (stack->len < 1)
+ 				goto out;
+@@ -907,14 +907,14 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_NIP:
++		case ccoin_OP_NIP:
+ 			// (x1 x2 -- x2)
+ 			if (stack->len < 2)
+ 				goto out;
+ 			parr_remove_idx(stack, stack->len - 2);
+ 			break;
+ 
+-		case OP_OVER: {
++		case ccoin_OP_OVER: {
+ 			// (x1 x2 -- x1 x2 x1)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -923,8 +923,8 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_PICK:
+-		case OP_ROLL: {
++		case ccoin_OP_PICK:
++		case ccoin_OP_ROLL: {
+ 			// (xn ... x2 x1 x0 n - xn ... x2 x1 x0 xn)
+ 			// (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
+ 			if (stack->len < 2)
+@@ -935,7 +935,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			if (n < 0 || n >= (int)stack->len)
+ 				goto out;
+ 			struct buffer *vch = stacktop(stack, -n-1);
+-			if (opcode == OP_ROLL) {
++			if (opcode == ccoin_OP_ROLL) {
+ 				vch = buffer_copy(vch->p, vch->len);
+ 				parr_remove_idx(stack,
+ 							 stack->len - n - 1);
+@@ -945,7 +945,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_ROT: {
++		case ccoin_OP_ROT: {
+ 			// (x1 x2 x3 -- x2 x3 x1)
+ 			//  x2 x1 x3  after first swap
+ 			//  x2 x3 x1  after second swap
+@@ -956,7 +956,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_SWAP: {
++		case ccoin_OP_SWAP: {
+ 			// (x1 x2 -- x2 x1)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -964,7 +964,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_TUCK: {
++		case ccoin_OP_TUCK: {
+ 			// (x1 x2 -- x2 x1 x2)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -973,7 +973,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_SIZE: {
++		case ccoin_OP_SIZE: {
+ 			// (in -- in size)
+ 			if (stack->len < 1)
+ 				goto out;
+@@ -984,23 +984,23 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 		}
+ 
+ 
+-		case OP_EQUAL:
+-		case OP_EQUALVERIFY: {
++		case ccoin_OP_EQUAL:
++		case ccoin_OP_EQUALVERIFY: {
+ 			// (x1 x2 - bool)
+ 			if (stack->len < 2)
+ 				goto out;
+ 			struct buffer *vch1 = stacktop(stack, -2);
+ 			struct buffer *vch2 = stacktop(stack, -1);
+ 			bool fEqual = buffer_equal(vch1, vch2);
+-			// OP_NOTEQUAL is disabled because it would be too easy to say
++			// ccoin_OP_NOTEQUAL is disabled because it would be too easy to say
+ 			// something like n != 1 and have some wiseguy pass in 1 with extra
+ 			// zero bytes after it (numerically, 0x01 == 0x0001 == 0x000001)
+-			//if (opcode == OP_NOTEQUAL)
++			//if (opcode == ccoin_OP_NOTEQUAL)
+ 			//	fEqual = !fEqual;
+ 			popstack(stack);
+ 			popstack(stack);
+ 			stack_push_char(stack, fEqual ? 1 : 0);
+-			if (opcode == OP_EQUALVERIFY) {
++			if (opcode == ccoin_OP_EQUALVERIFY) {
+ 				if (fEqual)
+ 					popstack(stack);
+ 				else
+@@ -1012,12 +1012,12 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 		//
+ 		// Numeric
+ 		//
+-		case OP_1ADD:
+-		case OP_1SUB:
+-		case OP_NEGATE:
+-		case OP_ABS:
+-		case OP_NOT:
+-		case OP_0NOTEQUAL: {
++		case ccoin_OP_1ADD:
++		case ccoin_OP_1SUB:
++		case ccoin_OP_NEGATE:
++		case ccoin_OP_ABS:
++		case ccoin_OP_NOT:
++		case ccoin_OP_0NOTEQUAL: {
+ 			// (in -- out)
+ 			if (stack->len < 1)
+ 				goto out;
+@@ -1025,22 +1025,22 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 				goto out;
+ 			switch (opcode)
+ 			{
+-			case OP_1ADD:
++			case ccoin_OP_1ADD:
+ 				mpz_add_ui(bn, bn, 1);
+ 				break;
+-			case OP_1SUB:
++			case ccoin_OP_1SUB:
+ 				mpz_sub_ui(bn, bn, 1);
+ 				break;
+-			case OP_NEGATE:
++			case ccoin_OP_NEGATE:
+ 				mpz_neg(bn, bn);
+ 				break;
+-			case OP_ABS:
++			case ccoin_OP_ABS:
+ 				mpz_abs(bn, bn);
+ 				break;
+-			case OP_NOT:
++			case ccoin_OP_NOT:
+ 				mpz_set_ui(bn, mpz_sgn(bn) == 0 ? 1 : 0);
+ 				break;
+-			case OP_0NOTEQUAL:
++			case ccoin_OP_0NOTEQUAL:
+ 				mpz_set_ui(bn, mpz_sgn(bn) == 0 ? 0 : 1);
+ 				break;
+ 			default:
+@@ -1052,19 +1052,19 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_ADD:
+-		case OP_SUB:
+-		case OP_BOOLAND:
+-		case OP_BOOLOR:
+-		case OP_NUMEQUAL:
+-		case OP_NUMEQUALVERIFY:
+-		case OP_NUMNOTEQUAL:
+-		case OP_LESSTHAN:
+-		case OP_GREATERTHAN:
+-		case OP_LESSTHANOREQUAL:
+-		case OP_GREATERTHANOREQUAL:
+-		case OP_MIN:
+-		case OP_MAX: {
++		case ccoin_OP_ADD:
++		case ccoin_OP_SUB:
++		case ccoin_OP_BOOLAND:
++		case ccoin_OP_BOOLOR:
++		case ccoin_OP_NUMEQUAL:
++		case ccoin_OP_NUMEQUALVERIFY:
++		case ccoin_OP_NUMNOTEQUAL:
++		case ccoin_OP_LESSTHAN:
++		case ccoin_OP_GREATERTHAN:
++		case ccoin_OP_LESSTHANOREQUAL:
++		case ccoin_OP_GREATERTHANOREQUAL:
++		case ccoin_OP_MIN:
++		case ccoin_OP_MAX: {
+ 			// (x1 x2 -- out)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -1081,54 +1081,54 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 
+ 			switch (opcode)
+ 			{
+-			case OP_ADD:
++			case ccoin_OP_ADD:
+ 				mpz_add(bn, bn1, bn2);
+ 				break;
+-			case OP_SUB:
++			case ccoin_OP_SUB:
+ 				mpz_sub(bn, bn1, bn2);
+ 				break;
+-			case OP_BOOLAND:
++			case ccoin_OP_BOOLAND:
+ 				mpz_set_ui(bn,
+ 				    !(mpz_sgn(bn1) == 0) && !(mpz_sgn(bn2) == 0) ?
+ 				    1 : 0);
+ 				break;
+-			case OP_BOOLOR:
++			case ccoin_OP_BOOLOR:
+ 				mpz_set_ui(bn,
+ 				    !(mpz_sgn(bn1) == 0) || !(mpz_sgn(bn2) == 0) ?
+ 				    1 : 0);
+ 				break;
+-			case OP_NUMEQUAL:
+-			case OP_NUMEQUALVERIFY:
++			case ccoin_OP_NUMEQUAL:
++			case ccoin_OP_NUMEQUALVERIFY:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) == 0 ?  1 : 0);
+ 				break;
+-			case OP_NUMNOTEQUAL:
++			case ccoin_OP_NUMNOTEQUAL:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) != 0 ?  1 : 0);
+ 				break;
+-			case OP_LESSTHAN:
++			case ccoin_OP_LESSTHAN:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) < 0 ?  1 : 0);
+ 				break;
+-			case OP_GREATERTHAN:
++			case ccoin_OP_GREATERTHAN:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) > 0 ?  1 : 0);
+ 				break;
+-			case OP_LESSTHANOREQUAL:
++			case ccoin_OP_LESSTHANOREQUAL:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) <= 0 ?  1 : 0);
+ 				break;
+-			case OP_GREATERTHANOREQUAL:
++			case ccoin_OP_GREATERTHANOREQUAL:
+ 				mpz_set_ui(bn,
+ 				    mpz_cmp(bn1, bn2) >= 0 ?  1 : 0);
+ 				break;
+-			case OP_MIN:
++			case ccoin_OP_MIN:
+ 				if (mpz_cmp(bn1, bn2) < 0)
+ 					mpz_set(bn, bn1);
+ 				else
+ 					mpz_set(bn, bn2);
+ 				break;
+-			case OP_MAX:
++			case ccoin_OP_MAX:
+ 				if (mpz_cmp(bn1, bn2) > 0)
+ 					mpz_set(bn, bn1);
+ 				else
+@@ -1144,7 +1144,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			mpz_clear(bn1);
+ 			mpz_clear(bn2);
+ 
+-			if (opcode == OP_NUMEQUALVERIFY)
++			if (opcode == ccoin_OP_NUMEQUALVERIFY)
+ 			{
+ 				if (CastToBool(stacktop(stack, -1)))
+ 					popstack(stack);
+@@ -1154,7 +1154,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_WITHIN: {
++		case ccoin_OP_WITHIN: {
+ 			// (x min max -- out)
+ 			if (stack->len < 3)
+ 				goto out;
+@@ -1182,11 +1182,11 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 		//
+ 		// Crypto
+ 		//
+-		case OP_RIPEMD160:
+-		case OP_SHA1:
+-		case OP_SHA256:
+-		case OP_HASH160:
+-		case OP_HASH256: {
++		case ccoin_OP_RIPEMD160:
++		case ccoin_OP_SHA1:
++		case ccoin_OP_SHA256:
++		case ccoin_OP_HASH160:
++		case ccoin_OP_HASH256: {
+ 			// (in -- hash)
+ 			if (stack->len < 1)
+ 				goto out;
+@@ -1195,23 +1195,23 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			unsigned char md[32];
+ 
+ 			switch (opcode) {
+-			case OP_RIPEMD160:
++			case ccoin_OP_RIPEMD160:
+ 				hashlen = 20;
+ 				ripemd160(vch->p, vch->len, md);
+ 				break;
+-			case OP_SHA1:
++			case ccoin_OP_SHA1:
+ 				hashlen = 20;
+ 				sha1_Raw(vch->p, vch->len, md);
+ 				break;
+-			case OP_SHA256:
++			case ccoin_OP_SHA256:
+ 				hashlen = 32;
+ 				sha256_Raw(vch->p, vch->len, md);
+ 				break;
+-			case OP_HASH160:
++			case ccoin_OP_HASH160:
+ 				hashlen = 20;
+ 				bu_Hash160(md, vch->p, vch->len);
+ 				break;
+-			case OP_HASH256:
++			case ccoin_OP_HASH256:
+ 				hashlen = 32;
+ 				bu_Hash(md, vch->p, vch->len);
+ 				break;
+@@ -1226,13 +1226,13 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_CODESEPARATOR:
++		case ccoin_OP_CODESEPARATOR:
+ 			// Hash starts after the code separator
+ 			memcpy(&pbegincodehash, &pc, sizeof(pc));
+ 			break;
+ 
+-		case OP_CHECKSIG:
+-		case OP_CHECKSIGVERIFY: {
++		case ccoin_OP_CHECKSIG:
++		case ccoin_OP_CHECKSIGVERIFY: {
+ 			// (sig pubkey -- bool)
+ 			if (stack->len < 2)
+ 				goto out;
+@@ -1268,7 +1268,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			popstack(stack);
+ 			popstack(stack);
+ 			stack_push_char(stack, fSuccess ? 1 : 0);
+-			if (opcode == OP_CHECKSIGVERIFY)
++			if (opcode == ccoin_OP_CHECKSIGVERIFY)
+ 			{
+ 				if (fSuccess)
+ 					popstack(stack);
+@@ -1278,8 +1278,8 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 			break;
+ 		}
+ 
+-		case OP_CHECKMULTISIG:
+-		case OP_CHECKMULTISIGVERIFY: {
++		case ccoin_OP_CHECKMULTISIG:
++		case ccoin_OP_CHECKMULTISIGVERIFY: {
+ 			// ([sig ...] num_of_signatures [pubkey ...] num_of_pubkeys -- bool)
+ 
+ 			int i = 1;
+@@ -1355,7 +1355,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
+ 				popstack(stack);
+ 			stack_push_char(stack, fSuccess ? 1 : 0);
+ 
+-			if (opcode == OP_CHECKMULTISIGVERIFY)
++			if (opcode == ccoin_OP_CHECKMULTISIGVERIFY)
+ 			{
+ 				if (fSuccess)
+ 					popstack(stack);
+diff --git a/lib/script_names.c b/lib/script_names.c
+index bb34027..b4a18d2 100644
+--- a/lib/script_names.c
++++ b/lib/script_names.c
+@@ -8,134 +8,134 @@
+ #include <ccoin/util.h>
+ 
+ static const char *opnames[256] = {
+-	[OP_0] = "OP_0",
+-	[OP_PUSHDATA1] = "OP_PUSHDATA1",
+-	[OP_PUSHDATA2] = "OP_PUSHDATA2",
+-	[OP_PUSHDATA4] = "OP_PUSHDATA4",
+-	[OP_1NEGATE] = "OP_1NEGATE",
+-	[OP_RESERVED] = "OP_RESERVED",
+-	[OP_1] = "OP_1",
+-	[OP_2] = "OP_2",
+-	[OP_3] = "OP_3",
+-	[OP_4] = "OP_4",
+-	[OP_5] = "OP_5",
+-	[OP_6] = "OP_6",
+-	[OP_7] = "OP_7",
+-	[OP_8] = "OP_8",
+-	[OP_9] = "OP_9",
+-	[OP_10] = "OP_10",
+-	[OP_11] = "OP_11",
+-	[OP_12] = "OP_12",
+-	[OP_13] = "OP_13",
+-	[OP_14] = "OP_14",
+-	[OP_15] = "OP_15",
+-	[OP_16] = "OP_16",
+-
+-	[OP_NOP] = "OP_NOP",
+-	[OP_VER] = "OP_VER",
+-	[OP_IF] = "OP_IF",
+-	[OP_NOTIF] = "OP_NOTIF",
+-	[OP_VERIF] = "OP_VERIF",
+-	[OP_VERNOTIF] = "OP_VERNOTIF",
+-	[OP_ELSE] = "OP_ELSE",
+-	[OP_ENDIF] = "OP_ENDIF",
+-	[OP_VERIFY] = "OP_VERIFY",
+-	[OP_RETURN] = "OP_RETURN",
+-
+-	[OP_TOALTSTACK] = "OP_TOALTSTACK",
+-	[OP_FROMALTSTACK] = "OP_FROMALTSTACK",
+-	[OP_2DROP] = "OP_2DROP",
+-	[OP_2DUP] = "OP_2DUP",
+-	[OP_3DUP] = "OP_3DUP",
+-	[OP_2OVER] = "OP_2OVER",
+-	[OP_2ROT] = "OP_2ROT",
+-	[OP_2SWAP] = "OP_2SWAP",
+-	[OP_IFDUP] = "OP_IFDUP",
+-	[OP_DEPTH] = "OP_DEPTH",
+-	[OP_DROP] = "OP_DROP",
+-	[OP_DUP] = "OP_DUP",
+-	[OP_NIP] = "OP_NIP",
+-	[OP_OVER] = "OP_OVER",
+-	[OP_PICK] = "OP_PICK",
+-	[OP_ROLL] = "OP_ROLL",
+-	[OP_ROT] = "OP_ROT",
+-	[OP_SWAP] = "OP_SWAP",
+-	[OP_TUCK] = "OP_TUCK",
+-
+-	[OP_CAT] = "OP_CAT",
+-	[OP_SUBSTR] = "OP_SUBSTR",
+-	[OP_LEFT] = "OP_LEFT",
+-	[OP_RIGHT] = "OP_RIGHT",
+-	[OP_SIZE] = "OP_SIZE",
+-
+-	[OP_INVERT] = "OP_INVERT",
+-	[OP_AND] = "OP_AND",
+-	[OP_OR] = "OP_OR",
+-	[OP_XOR] = "OP_XOR",
+-	[OP_EQUAL] = "OP_EQUAL",
+-	[OP_EQUALVERIFY] = "OP_EQUALVERIFY",
+-	[OP_RESERVED1] = "OP_RESERVED1",
+-	[OP_RESERVED2] = "OP_RESERVED2",
+-
+-	[OP_1ADD] = "OP_1ADD",
+-	[OP_1SUB] = "OP_1SUB",
+-	[OP_2MUL] = "OP_2MUL",
+-	[OP_2DIV] = "OP_2DIV",
+-	[OP_NEGATE] = "OP_NEGATE",
+-	[OP_ABS] = "OP_ABS",
+-	[OP_NOT] = "OP_NOT",
+-	[OP_0NOTEQUAL] = "OP_0NOTEQUAL",
+-
+-	[OP_ADD] = "OP_ADD",
+-	[OP_SUB] = "OP_SUB",
+-	[OP_MUL] = "OP_MUL",
+-	[OP_DIV] = "OP_DIV",
+-	[OP_MOD] = "OP_MOD",
+-	[OP_LSHIFT] = "OP_LSHIFT",
+-	[OP_RSHIFT] = "OP_RSHIFT",
+-
+-	[OP_BOOLAND] = "OP_BOOLAND",
+-	[OP_BOOLOR] = "OP_BOOLOR",
+-	[OP_NUMEQUAL] = "OP_NUMEQUAL",
+-	[OP_NUMEQUALVERIFY] = "OP_NUMEQUALVERIFY",
+-	[OP_NUMNOTEQUAL] = "OP_NUMNOTEQUAL",
+-	[OP_LESSTHAN] = "OP_LESSTHAN",
+-	[OP_GREATERTHAN] = "OP_GREATERTHAN",
+-	[OP_LESSTHANOREQUAL] = "OP_LESSTHANOREQUAL",
+-	[OP_GREATERTHANOREQUAL] = "OP_GREATERTHANOREQUAL",
+-	[OP_MIN] = "OP_MIN",
+-	[OP_MAX] = "OP_MAX",
+-
+-	[OP_WITHIN] = "OP_WITHIN",
+-
+-	[OP_RIPEMD160] = "OP_RIPEMD160",
+-	[OP_SHA1] = "OP_SHA1",
+-	[OP_SHA256] = "OP_SHA256",
+-	[OP_HASH160] = "OP_HASH160",
+-	[OP_HASH256] = "OP_HASH256",
+-	[OP_CODESEPARATOR] = "OP_CODESEPARATOR",
+-	[OP_CHECKSIG] = "OP_CHECKSIG",
+-	[OP_CHECKSIGVERIFY] = "OP_CHECKSIGVERIFY",
+-	[OP_CHECKMULTISIG] = "OP_CHECKMULTISIG",
+-	[OP_CHECKMULTISIGVERIFY] = "OP_CHECKMULTISIGVERIFY",
+-
+-	[OP_NOP1] = "OP_NOP1",
+-	[OP_CHECKLOCKTIMEVERIFY] = "OP_CHECKLOCKTIMEVERIFY",
+-	[OP_CHECKSEQUENCEVERIFY] = "OP_CHECKSEQUENCEVERIFY",
+-	[OP_NOP4] = "OP_NOP4",
+-	[OP_NOP5] = "OP_NOP5",
+-	[OP_NOP6] = "OP_NOP6",
+-	[OP_NOP7] = "OP_NOP7",
+-	[OP_NOP8] = "OP_NOP8",
+-	[OP_NOP9] = "OP_NOP9",
+-	[OP_NOP10] = "OP_NOP10",
+-
+-
+-
+-	[OP_SMALLINTEGER] = "OP_SMALLINTEGER",
+-	[OP_PUBKEYS] = "OP_PUBKEYS",
+-	[OP_PUBKEYHASH] = "OP_PUBKEYHASH",
+-	[OP_PUBKEY] = "OP_PUBKEY",
++	[ccoin_OP_0] = "ccoin_OP_0",
++	[ccoin_OP_PUSHDATA1] = "ccoin_OP_PUSHDATA1",
++	[ccoin_OP_PUSHDATA2] = "ccoin_OP_PUSHDATA2",
++	[ccoin_OP_PUSHDATA4] = "ccoin_OP_PUSHDATA4",
++	[ccoin_OP_1NEGATE] = "ccoin_OP_1NEGATE",
++	[ccoin_OP_RESERVED] = "ccoin_OP_RESERVED",
++	[ccoin_OP_1] = "ccoin_OP_1",
++	[ccoin_OP_2] = "ccoin_OP_2",
++	[ccoin_OP_3] = "ccoin_OP_3",
++	[ccoin_OP_4] = "ccoin_OP_4",
++	[ccoin_OP_5] = "ccoin_OP_5",
++	[ccoin_OP_6] = "ccoin_OP_6",
++	[ccoin_OP_7] = "ccoin_OP_7",
++	[ccoin_OP_8] = "ccoin_OP_8",
++	[ccoin_OP_9] = "ccoin_OP_9",
++	[ccoin_OP_10] = "ccoin_OP_10",
++	[ccoin_OP_11] = "ccoin_OP_11",
++	[ccoin_OP_12] = "ccoin_OP_12",
++	[ccoin_OP_13] = "ccoin_OP_13",
++	[ccoin_OP_14] = "ccoin_OP_14",
++	[ccoin_OP_15] = "ccoin_OP_15",
++	[ccoin_OP_16] = "ccoin_OP_16",
++
++	[ccoin_OP_NOP] = "ccoin_OP_NOP",
++	[ccoin_OP_VER] = "ccoin_OP_VER",
++	[ccoin_OP_IF] = "ccoin_OP_IF",
++	[ccoin_OP_NOTIF] = "ccoin_OP_NOTIF",
++	[ccoin_OP_VERIF] = "ccoin_OP_VERIF",
++	[ccoin_OP_VERNOTIF] = "ccoin_OP_VERNOTIF",
++	[ccoin_OP_ELSE] = "ccoin_OP_ELSE",
++	[ccoin_OP_ENDIF] = "ccoin_OP_ENDIF",
++	[ccoin_OP_VERIFY] = "ccoin_OP_VERIFY",
++	[ccoin_OP_RETURN] = "ccoin_OP_RETURN",
++
++	[ccoin_OP_TOALTSTACK] = "ccoin_OP_TOALTSTACK",
++	[ccoin_OP_FROMALTSTACK] = "ccoin_OP_FROMALTSTACK",
++	[ccoin_OP_2DROP] = "ccoin_OP_2DROP",
++	[ccoin_OP_2DUP] = "ccoin_OP_2DUP",
++	[ccoin_OP_3DUP] = "ccoin_OP_3DUP",
++	[ccoin_OP_2OVER] = "ccoin_OP_2OVER",
++	[ccoin_OP_2ROT] = "ccoin_OP_2ROT",
++	[ccoin_OP_2SWAP] = "ccoin_OP_2SWAP",
++	[ccoin_OP_IFDUP] = "ccoin_OP_IFDUP",
++	[ccoin_OP_DEPTH] = "ccoin_OP_DEPTH",
++	[ccoin_OP_DROP] = "ccoin_OP_DROP",
++	[ccoin_OP_DUP] = "ccoin_OP_DUP",
++	[ccoin_OP_NIP] = "ccoin_OP_NIP",
++	[ccoin_OP_OVER] = "ccoin_OP_OVER",
++	[ccoin_OP_PICK] = "ccoin_OP_PICK",
++	[ccoin_OP_ROLL] = "ccoin_OP_ROLL",
++	[ccoin_OP_ROT] = "ccoin_OP_ROT",
++	[ccoin_OP_SWAP] = "ccoin_OP_SWAP",
++	[ccoin_OP_TUCK] = "ccoin_OP_TUCK",
++
++	[ccoin_OP_CAT] = "ccoin_OP_CAT",
++	[ccoin_OP_SUBSTR] = "ccoin_OP_SUBSTR",
++	[ccoin_OP_LEFT] = "ccoin_OP_LEFT",
++	[ccoin_OP_RIGHT] = "ccoin_OP_RIGHT",
++	[ccoin_OP_SIZE] = "ccoin_OP_SIZE",
++
++	[ccoin_OP_INVERT] = "ccoin_OP_INVERT",
++	[ccoin_OP_AND] = "ccoin_OP_AND",
++	[ccoin_OP_OR] = "ccoin_OP_OR",
++	[ccoin_OP_XOR] = "ccoin_OP_XOR",
++	[ccoin_OP_EQUAL] = "ccoin_OP_EQUAL",
++	[ccoin_OP_EQUALVERIFY] = "ccoin_OP_EQUALVERIFY",
++	[ccoin_OP_RESERVED1] = "ccoin_OP_RESERVED1",
++	[ccoin_OP_RESERVED2] = "ccoin_OP_RESERVED2",
++
++	[ccoin_OP_1ADD] = "ccoin_OP_1ADD",
++	[ccoin_OP_1SUB] = "ccoin_OP_1SUB",
++	[ccoin_OP_2MUL] = "ccoin_OP_2MUL",
++	[ccoin_OP_2DIV] = "ccoin_OP_2DIV",
++	[ccoin_OP_NEGATE] = "ccoin_OP_NEGATE",
++	[ccoin_OP_ABS] = "ccoin_OP_ABS",
++	[ccoin_OP_NOT] = "ccoin_OP_NOT",
++	[ccoin_OP_0NOTEQUAL] = "ccoin_OP_0NOTEQUAL",
++
++	[ccoin_OP_ADD] = "ccoin_OP_ADD",
++	[ccoin_OP_SUB] = "ccoin_OP_SUB",
++	[ccoin_OP_MUL] = "ccoin_OP_MUL",
++	[ccoin_OP_DIV] = "ccoin_OP_DIV",
++	[ccoin_OP_MOD] = "ccoin_OP_MOD",
++	[ccoin_OP_LSHIFT] = "ccoin_OP_LSHIFT",
++	[ccoin_OP_RSHIFT] = "ccoin_OP_RSHIFT",
++
++	[ccoin_OP_BOOLAND] = "ccoin_OP_BOOLAND",
++	[ccoin_OP_BOOLOR] = "ccoin_OP_BOOLOR",
++	[ccoin_OP_NUMEQUAL] = "ccoin_OP_NUMEQUAL",
++	[ccoin_OP_NUMEQUALVERIFY] = "ccoin_OP_NUMEQUALVERIFY",
++	[ccoin_OP_NUMNOTEQUAL] = "ccoin_OP_NUMNOTEQUAL",
++	[ccoin_OP_LESSTHAN] = "ccoin_OP_LESSTHAN",
++	[ccoin_OP_GREATERTHAN] = "ccoin_OP_GREATERTHAN",
++	[ccoin_OP_LESSTHANOREQUAL] = "ccoin_OP_LESSTHANOREQUAL",
++	[ccoin_OP_GREATERTHANOREQUAL] = "ccoin_OP_GREATERTHANOREQUAL",
++	[ccoin_OP_MIN] = "ccoin_OP_MIN",
++	[ccoin_OP_MAX] = "ccoin_OP_MAX",
++
++	[ccoin_OP_WITHIN] = "ccoin_OP_WITHIN",
++
++	[ccoin_OP_RIPEMD160] = "ccoin_OP_RIPEMD160",
++	[ccoin_OP_SHA1] = "ccoin_OP_SHA1",
++	[ccoin_OP_SHA256] = "ccoin_OP_SHA256",
++	[ccoin_OP_HASH160] = "ccoin_OP_HASH160",
++	[ccoin_OP_HASH256] = "ccoin_OP_HASH256",
++	[ccoin_OP_CODESEPARATOR] = "ccoin_OP_CODESEPARATOR",
++	[ccoin_OP_CHECKSIG] = "ccoin_OP_CHECKSIG",
++	[ccoin_OP_CHECKSIGVERIFY] = "ccoin_OP_CHECKSIGVERIFY",
++	[ccoin_OP_CHECKMULTISIG] = "ccoin_OP_CHECKMULTISIG",
++	[ccoin_OP_CHECKMULTISIGVERIFY] = "ccoin_OP_CHECKMULTISIGVERIFY",
++
++	[ccoin_OP_NOP1] = "ccoin_OP_NOP1",
++	[ccoin_OP_CHECKLOCKTIMEVERIFY] = "ccoin_OP_CHECKLOCKTIMEVERIFY",
++	[ccoin_OP_CHECKSEQUENCEVERIFY] = "ccoin_OP_CHECKSEQUENCEVERIFY",
++	[ccoin_OP_NOP4] = "ccoin_OP_NOP4",
++	[ccoin_OP_NOP5] = "ccoin_OP_NOP5",
++	[ccoin_OP_NOP6] = "ccoin_OP_NOP6",
++	[ccoin_OP_NOP7] = "ccoin_OP_NOP7",
++	[ccoin_OP_NOP8] = "ccoin_OP_NOP8",
++	[ccoin_OP_NOP9] = "ccoin_OP_NOP9",
++	[ccoin_OP_NOP10] = "ccoin_OP_NOP10",
++
++
++
++	[ccoin_OP_SMALLINTEGER] = "ccoin_OP_SMALLINTEGER",
++	[ccoin_OP_PUBKEYS] = "ccoin_OP_PUBKEYS",
++	[ccoin_OP_PUBKEYHASH] = "ccoin_OP_PUBKEYHASH",
++	[ccoin_OP_PUBKEY] = "ccoin_OP_PUBKEY",
+ };
+ 
+ const char *GetOpName(enum opcodetype opcode_)
+@@ -161,13 +161,13 @@ enum opcodetype GetOpType(const char *opname)
+ 			if (!strcmp(opname, opnames[i]))
+ 				return (enum opcodetype) i;
+ 
+-			strcpy(tmpname, "OP_");
++			strcpy(tmpname, "ccoin_OP_");
+ 			strcat(tmpname, opname);
+ 			if (!strcmp(tmpname, opnames[i]))
+ 				return (enum opcodetype) i;
+ 		}
+ 	}
+ 
+-	return OP_INVALIDOPCODE;
++	return ccoin_OP_INVALIDOPCODE;
+ }
+ 
+diff --git a/src/blkstats.c b/src/blkstats.c
+index d035eea..46f389d 100644
+--- a/src/blkstats.c
++++ b/src/blkstats.c
+@@ -137,9 +137,9 @@ static void scan_txout(struct bp_txout *txout)
+ 		incstat(STA_MULTISIG);
+ 		break;
+ 	default: {
+-		if (match_op_pos(script, OP_RETURN, 0))
++		if (match_op_pos(script, ccoin_OP_RETURN, 0))
+ 			incstat(STA_OP_RETURN);
+-		else if (match_op_pos(script, OP_DROP, 1))
++		else if (match_op_pos(script, ccoin_OP_DROP, 1))
+ 			incstat(STA_OP_DROP);
+ 		else
+ 			incstat(STA_UNKNOWN);
+diff --git a/test/libtest.c b/test/libtest.c
+index 4ccbf10..21a3b3b 100644
+--- a/test/libtest.c
++++ b/test/libtest.c
+@@ -167,7 +167,7 @@ cstring *parse_script_str(const char *enc)
+ 			 (token[strlen(token) - 1] == '\''))
+ 			bsp_push_data(script, &token[1], strlen(token) - 2);
+ 
+-		else if (GetOpType(token) != OP_INVALIDOPCODE)
++		else if (GetOpType(token) != ccoin_OP_INVALIDOPCODE)
+ 			bsp_push_op(script, GetOpType(token));
+ 
+ 		else
+diff --git a/test/script-parse.c b/test/script-parse.c
+index 239c652..dd8225a 100644
+--- a/test/script-parse.c
++++ b/test/script-parse.c
+@@ -114,10 +114,10 @@ static void runtest(const char *ser_fn_base)
+ 
+ int main (int argc, char *argv[])
+ {
+-	const char *opn = GetOpName(OP_PUBKEY);
+-	assert(!strcmp(opn, "OP_PUBKEY"));
++	const char *opn = GetOpName(ccoin_OP_PUBKEY);
++	assert(!strcmp(opn, "ccoin_OP_PUBKEY"));
+ 
+-	opn = GetOpName(OP_INVALIDOPCODE);
++	opn = GetOpName(ccoin_OP_INVALIDOPCODE);
+ 	assert(!strcmp(opn, "<unknown>"));
+ 
+ 	runtest("blk120383.ser");
+diff --git a/test/script_tests.json b/test/script_tests.json
+index b579160..b7e162b 100644
+--- a/test/script_tests.json
++++ b/test/script_tests.json
+@@ -19,9 +19,9 @@
+ ["0x4b 0x417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
+  "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL", "P2SH,STRICTENC", "OK", "push 75 bytes"],
+ 
+-["0x4c 0x01 0x07","7 EQUAL", "P2SH,STRICTENC", "OK", "0x4c is OP_PUSHDATA1"],
+-["0x4d 0x0100 0x08","8 EQUAL", "P2SH,STRICTENC", "OK", "0x4d is OP_PUSHDATA2"],
+-["0x4e 0x01000000 0x09","9 EQUAL", "P2SH,STRICTENC", "OK", "0x4e is OP_PUSHDATA4"],
++["0x4c 0x01 0x07","7 EQUAL", "P2SH,STRICTENC", "OK", "0x4c is ccoin_OP_PUSHDATA1"],
++["0x4d 0x0100 0x08","8 EQUAL", "P2SH,STRICTENC", "OK", "0x4d is ccoin_OP_PUSHDATA2"],
++["0x4e 0x01000000 0x09","9 EQUAL", "P2SH,STRICTENC", "OK", "0x4e is ccoin_OP_PUSHDATA4"],
+ 
+ ["0x4c 0x00","0 EQUAL", "P2SH,STRICTENC", "OK"],
+ ["0x4d 0x0000","0 EQUAL", "P2SH,STRICTENC", "OK"],
+@@ -226,9 +226,9 @@
+ 
+ 
+ ["1","NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10 1 EQUAL", "P2SH,STRICTENC", "OK"],
+-["'NOP_1_to_10' NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10","'NOP_1_to_10' EQUAL", "P2SH,STRICTENC", "OK"],
++["'Nccoin_OP_1_to_10' NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10","'Nccoin_OP_1_to_10' EQUAL", "P2SH,STRICTENC", "OK"],
+ 
+-["1", "NOP", "P2SH,STRICTENC,DISCOURAGE_UPGRADABLE_NOPS", "OK", "Discourage NOPx flag allows OP_NOP"],
++["1", "NOP", "P2SH,STRICTENC,DISCOURAGE_UPGRADABLE_NOPS", "OK", "Discourage NOPx flag allows ccoin_OP_NOP"],
+ 
+ ["0", "IF NOP10 ENDIF 1", "P2SH,STRICTENC,DISCOURAGE_UPGRADABLE_NOPS", "OK",
+  "Discouraged NOPs are allowed if not executed"],
+@@ -524,27 +524,27 @@
+ "P2SH,STRICTENC", "OK",
+ "Basic PUSHDATA1 signedness check"],
+ 
+-["0x00", "SIZE 0 EQUAL", "P2SH,STRICTENC", "OK", "Basic OP_0 execution"],
++["0x00", "SIZE 0 EQUAL", "P2SH,STRICTENC", "OK", "Basic ccoin_OP_0 execution"],
+ 
+ ["Numeric pushes"],
+ 
+ ["0x01 0x81", "0x4f EQUAL", "", "OK", "OP1_NEGATE pushes 0x81"],
+-["0x01 0x01", "0x51 EQUAL", "", "OK", "OP_1  pushes 0x01"],
+-["0x01 0x02", "0x52 EQUAL", "", "OK", "OP_2  pushes 0x02"],
+-["0x01 0x03", "0x53 EQUAL", "", "OK", "OP_3  pushes 0x03"],
+-["0x01 0x04", "0x54 EQUAL", "", "OK", "OP_4  pushes 0x04"],
+-["0x01 0x05", "0x55 EQUAL", "", "OK", "OP_5  pushes 0x05"],
+-["0x01 0x06", "0x56 EQUAL", "", "OK", "OP_6  pushes 0x06"],
+-["0x01 0x07", "0x57 EQUAL", "", "OK", "OP_7  pushes 0x07"],
+-["0x01 0x08", "0x58 EQUAL", "", "OK", "OP_8  pushes 0x08"],
+-["0x01 0x09", "0x59 EQUAL", "", "OK", "OP_9  pushes 0x09"],
+-["0x01 0x0a", "0x5a EQUAL", "", "OK", "OP_10 pushes 0x0a"],
+-["0x01 0x0b", "0x5b EQUAL", "", "OK", "OP_11 pushes 0x0b"],
+-["0x01 0x0c", "0x5c EQUAL", "", "OK", "OP_12 pushes 0x0c"],
+-["0x01 0x0d", "0x5d EQUAL", "", "OK", "OP_13 pushes 0x0d"],
+-["0x01 0x0e", "0x5e EQUAL", "", "OK", "OP_14 pushes 0x0e"],
+-["0x01 0x0f", "0x5f EQUAL", "", "OK", "OP_15 pushes 0x0f"],
+-["0x01 0x10", "0x60 EQUAL", "", "OK", "OP_16 pushes 0x10"],
++["0x01 0x01", "0x51 EQUAL", "", "OK", "ccoin_OP_1  pushes 0x01"],
++["0x01 0x02", "0x52 EQUAL", "", "OK", "ccoin_OP_2  pushes 0x02"],
++["0x01 0x03", "0x53 EQUAL", "", "OK", "ccoin_OP_3  pushes 0x03"],
++["0x01 0x04", "0x54 EQUAL", "", "OK", "ccoin_OP_4  pushes 0x04"],
++["0x01 0x05", "0x55 EQUAL", "", "OK", "ccoin_OP_5  pushes 0x05"],
++["0x01 0x06", "0x56 EQUAL", "", "OK", "ccoin_OP_6  pushes 0x06"],
++["0x01 0x07", "0x57 EQUAL", "", "OK", "ccoin_OP_7  pushes 0x07"],
++["0x01 0x08", "0x58 EQUAL", "", "OK", "ccoin_OP_8  pushes 0x08"],
++["0x01 0x09", "0x59 EQUAL", "", "OK", "ccoin_OP_9  pushes 0x09"],
++["0x01 0x0a", "0x5a EQUAL", "", "OK", "ccoin_OP_10 pushes 0x0a"],
++["0x01 0x0b", "0x5b EQUAL", "", "OK", "ccoin_OP_11 pushes 0x0b"],
++["0x01 0x0c", "0x5c EQUAL", "", "OK", "ccoin_OP_12 pushes 0x0c"],
++["0x01 0x0d", "0x5d EQUAL", "", "OK", "ccoin_OP_13 pushes 0x0d"],
++["0x01 0x0e", "0x5e EQUAL", "", "OK", "ccoin_OP_14 pushes 0x0e"],
++["0x01 0x0f", "0x5f EQUAL", "", "OK", "ccoin_OP_15 pushes 0x0f"],
++["0x01 0x10", "0x60 EQUAL", "", "OK", "ccoin_OP_16 pushes 0x10"],
+ 
+ ["Equivalency of different numeric encodings"],
+ 
+@@ -564,22 +564,22 @@
+ ["0 IF 0x4d 0x0000 ENDIF 1", "", "MINIMALDATA", "OK", "non-minimal PUSHDATA2 ignored"],
+ ["0 IF 0x4c 0x00000000 ENDIF 1", "", "MINIMALDATA", "OK", "non-minimal PUSHDATA4 ignored"],
+ ["0 IF 0x01 0x81 ENDIF 1", "", "MINIMALDATA", "OK", "1NEGATE equiv"],
+-["0 IF 0x01 0x01 ENDIF 1", "", "MINIMALDATA", "OK", "OP_1  equiv"],
+-["0 IF 0x01 0x02 ENDIF 1", "", "MINIMALDATA", "OK", "OP_2  equiv"],
+-["0 IF 0x01 0x03 ENDIF 1", "", "MINIMALDATA", "OK", "OP_3  equiv"],
+-["0 IF 0x01 0x04 ENDIF 1", "", "MINIMALDATA", "OK", "OP_4  equiv"],
+-["0 IF 0x01 0x05 ENDIF 1", "", "MINIMALDATA", "OK", "OP_5  equiv"],
+-["0 IF 0x01 0x06 ENDIF 1", "", "MINIMALDATA", "OK", "OP_6  equiv"],
+-["0 IF 0x01 0x07 ENDIF 1", "", "MINIMALDATA", "OK", "OP_7  equiv"],
+-["0 IF 0x01 0x08 ENDIF 1", "", "MINIMALDATA", "OK", "OP_8  equiv"],
+-["0 IF 0x01 0x09 ENDIF 1", "", "MINIMALDATA", "OK", "OP_9  equiv"],
+-["0 IF 0x01 0x0a ENDIF 1", "", "MINIMALDATA", "OK", "OP_10 equiv"],
+-["0 IF 0x01 0x0b ENDIF 1", "", "MINIMALDATA", "OK", "OP_11 equiv"],
+-["0 IF 0x01 0x0c ENDIF 1", "", "MINIMALDATA", "OK", "OP_12 equiv"],
+-["0 IF 0x01 0x0d ENDIF 1", "", "MINIMALDATA", "OK", "OP_13 equiv"],
+-["0 IF 0x01 0x0e ENDIF 1", "", "MINIMALDATA", "OK", "OP_14 equiv"],
+-["0 IF 0x01 0x0f ENDIF 1", "", "MINIMALDATA", "OK", "OP_15 equiv"],
+-["0 IF 0x01 0x10 ENDIF 1", "", "MINIMALDATA", "OK", "OP_16 equiv"],
++["0 IF 0x01 0x01 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_1  equiv"],
++["0 IF 0x01 0x02 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_2  equiv"],
++["0 IF 0x01 0x03 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_3  equiv"],
++["0 IF 0x01 0x04 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_4  equiv"],
++["0 IF 0x01 0x05 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_5  equiv"],
++["0 IF 0x01 0x06 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_6  equiv"],
++["0 IF 0x01 0x07 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_7  equiv"],
++["0 IF 0x01 0x08 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_8  equiv"],
++["0 IF 0x01 0x09 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_9  equiv"],
++["0 IF 0x01 0x0a ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_10 equiv"],
++["0 IF 0x01 0x0b ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_11 equiv"],
++["0 IF 0x01 0x0c ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_12 equiv"],
++["0 IF 0x01 0x0d ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_13 equiv"],
++["0 IF 0x01 0x0e ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_14 equiv"],
++["0 IF 0x01 0x0f ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_15 equiv"],
++["0 IF 0x01 0x10 ENDIF 1", "", "MINIMALDATA", "OK", "ccoin_OP_16 equiv"],
+ 
+ ["Numeric minimaldata rules are only applied when a stack item is numerically evaluated; the push itself is allowed"],
+ 
+@@ -738,8 +738,8 @@
+ ["1 1", "NOTIF IF 1 ELSE 0 ENDIF ELSE IF 0 ELSE 1 ENDIF ENDIF", "P2SH,STRICTENC", "EVAL_FALSE"],
+ ["0 0", "NOTIF IF 1 ELSE 0 ENDIF ELSE IF 0 ELSE 1 ENDIF ENDIF", "P2SH,STRICTENC", "EVAL_FALSE"],
+ 
+-["1", "IF RETURN ELSE ELSE 1 ENDIF", "P2SH,STRICTENC", "OP_RETURN", "Multiple ELSEs"],
+-["1", "IF 1 ELSE ELSE RETURN ENDIF", "P2SH,STRICTENC", "OP_RETURN"],
++["1", "IF RETURN ELSE ELSE 1 ENDIF", "P2SH,STRICTENC", "ccoin_OP_RETURN", "Multiple ELSEs"],
++["1", "IF 1 ELSE ELSE RETURN ENDIF", "P2SH,STRICTENC", "ccoin_OP_RETURN"],
+ 
+ ["1", "ENDIF", "P2SH,STRICTENC", "UNBALANCED_CONDITIONAL", "Malformed IF/ELSE/ENDIF sequence"],
+ ["1", "ELSE ENDIF", "P2SH,STRICTENC", "UNBALANCED_CONDITIONAL"],
+@@ -750,10 +750,10 @@
+ ["1", "IF ENDIF ENDIF", "P2SH,STRICTENC", "UNBALANCED_CONDITIONAL"],
+ ["1", "IF ELSE ELSE ENDIF ENDIF", "P2SH,STRICTENC", "UNBALANCED_CONDITIONAL"],
+ 
+-["1", "RETURN", "P2SH,STRICTENC", "OP_RETURN"],
+-["1", "DUP IF RETURN ENDIF", "P2SH,STRICTENC", "OP_RETURN"],
++["1", "RETURN", "P2SH,STRICTENC", "ccoin_OP_RETURN"],
++["1", "DUP IF RETURN ENDIF", "P2SH,STRICTENC", "ccoin_OP_RETURN"],
+ 
+-["1", "RETURN 'data'", "P2SH,STRICTENC", "OP_RETURN", "canonical prunable txout format"],
++["1", "RETURN 'data'", "P2SH,STRICTENC", "ccoin_OP_RETURN", "canonical prunable txout format"],
+ ["0 IF", "RETURN ENDIF 1", "P2SH,STRICTENC", "UNBALANCED_CONDITIONAL", "still prunable because IF/ENDIF can't span scriptSig/scriptPubKey"],
+ 
+ ["0", "VERIFY 1", "P2SH,STRICTENC", "VERIFY"],
+@@ -844,7 +844,7 @@
+ ["2 1 RSHIFT", "1 EQUAL", "P2SH,STRICTENC", "DISABLED_OPCODE", "disabled"],
+ 
+ ["1", "NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10 2 EQUAL", "P2SH,STRICTENC", "EVAL_FALSE"],
+-["'NOP_1_to_10' NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10","'NOP_1_to_11' EQUAL", "P2SH,STRICTENC", "EVAL_FALSE"],
++["'Nccoin_OP_1_to_10' NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10","'Nccoin_OP_1_to_11' EQUAL", "P2SH,STRICTENC", "EVAL_FALSE"],
+ 
+ ["Ensure 100% coverage of discouraged NOPS"],
+ ["1", "NOP1",  "P2SH,DISCOURAGE_UPGRADABLE_NOPS", "DISCOURAGE_UPGRADABLE_NOPS"],
+@@ -956,12 +956,12 @@
+ ["1",
+ "0x61616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161",
+ "P2SH,STRICTENC",
+-"OP_COUNT",
++"ccoin_OP_COUNT",
+ ">201 opcodes executed. 0x61 is NOP"],
+ ["0",
+ "IF 0x6161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161 ENDIF 1",
+ "P2SH,STRICTENC",
+-"OP_COUNT",
++"ccoin_OP_COUNT",
+ ">201 opcodes including non-executed IF branch. 0x61 is NOP"],
+ ["1 2 3 4 5 0x6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f",
+ "1 2 3 4 5 6 0x6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f",
+@@ -981,13 +981,13 @@
+ 
+ ["NOP1","NOP10", "P2SH,STRICTENC", "EVAL_FALSE"],
+ 
+-["1","VER", "P2SH,STRICTENC", "BAD_OPCODE", "OP_VER is reserved"],
+-["1","VERIF", "P2SH,STRICTENC", "BAD_OPCODE", "OP_VERIF is reserved"],
+-["1","VERNOTIF", "P2SH,STRICTENC", "BAD_OPCODE", "OP_VERNOTIF is reserved"],
+-["1","RESERVED", "P2SH,STRICTENC", "BAD_OPCODE", "OP_RESERVED is reserved"],
+-["1","RESERVED1", "P2SH,STRICTENC", "BAD_OPCODE", "OP_RESERVED1 is reserved"],
+-["1","RESERVED2", "P2SH,STRICTENC", "BAD_OPCODE", "OP_RESERVED2 is reserved"],
+-["1","0xba", "P2SH,STRICTENC", "BAD_OPCODE", "0xba == OP_NOP10 + 1"],
++["1","VER", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_VER is reserved"],
++["1","VERIF", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_VERIF is reserved"],
++["1","VERNOTIF", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_VERNOTIF is reserved"],
++["1","RESERVED", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_RESERVED is reserved"],
++["1","RESERVED1", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_RESERVED1 is reserved"],
++["1","RESERVED2", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_RESERVED2 is reserved"],
++["1","0xba", "P2SH,STRICTENC", "BAD_OPCODE", "0xba == ccoin_OP_NOP10 + 1"],
+ 
+ ["2147483648", "1ADD 1", "P2SH,STRICTENC", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
+ ["2147483648", "NEGATE 1", "P2SH,STRICTENC", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
+@@ -1073,7 +1073,7 @@
+ ["",
+ "0 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG 0 0 CHECKMULTISIG",
+ "P2SH,STRICTENC",
+-"OP_COUNT",
++"ccoin_OP_COUNT",
+ "202 CHECKMULTISIGS, fails due to 201 op limit"],
+ 
+ ["1",
+@@ -1085,13 +1085,13 @@
+ ["",
+ "NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIG",
+ "P2SH,STRICTENC",
+-"OP_COUNT",
++"ccoin_OP_COUNT",
+ "Fails due to 201 script operation limit"],
+ 
+ ["1",
+ "NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP NOP 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY 0 0 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k' 'l' 'm' 'n' 'o' 'p' 'q' 'r' 's' 't' 20 CHECKMULTISIGVERIFY",
+ "P2SH,STRICTENC",
+-"OP_COUNT",
++"ccoin_OP_COUNT",
+ ""],
+ 
+ ["0 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21", "21 CHECKMULTISIG 1", "P2SH,STRICTENC", "PUBKEY_COUNT", "nPubKeys > 20"],
+@@ -1100,16 +1100,16 @@
+ ["NOP 0x01 1", "HASH160 0x14 0xda1745e9b549bd0bfa1a569971c77eba30cd5a4b EQUAL", "P2SH,STRICTENC", "SIG_PUSHONLY", "Tests for Script.IsPushOnly()"],
+ ["NOP1 0x01 1", "HASH160 0x14 0xda1745e9b549bd0bfa1a569971c77eba30cd5a4b EQUAL", "P2SH,STRICTENC", "SIG_PUSHONLY"],
+ 
+-["0 0x01 0x50", "HASH160 0x14 0xece424a6bb6ddf4db592c0faed60685047a361b1 EQUAL", "P2SH,STRICTENC", "BAD_OPCODE", "OP_RESERVED in P2SH should fail"],
+-["0 0x01 VER", "HASH160 0x14 0x0f4d7845db968f2a81b530b6f3c1d6246d4c7e01 EQUAL", "P2SH,STRICTENC", "BAD_OPCODE", "OP_VER in P2SH should fail"],
++["0 0x01 0x50", "HASH160 0x14 0xece424a6bb6ddf4db592c0faed60685047a361b1 EQUAL", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_RESERVED in P2SH should fail"],
++["0 0x01 VER", "HASH160 0x14 0x0f4d7845db968f2a81b530b6f3c1d6246d4c7e01 EQUAL", "P2SH,STRICTENC", "BAD_OPCODE", "ccoin_OP_VER in P2SH should fail"],
+ 
+-["0x00", "'00' EQUAL", "P2SH,STRICTENC", "EVAL_FALSE", "Basic OP_0 execution"],
++["0x00", "'00' EQUAL", "P2SH,STRICTENC", "EVAL_FALSE", "Basic ccoin_OP_0 execution"],
+ 
+ ["MINIMALDATA enforcement for PUSHDATAs"],
+ 
+-["0x4c 0x00", "DROP 1", "MINIMALDATA", "MINIMALDATA", "Empty vector minimally represented by OP_0"],
+-["0x01 0x81", "DROP 1", "MINIMALDATA", "MINIMALDATA", "-1 minimally represented by OP_1NEGATE"],
+-["0x01 0x01", "DROP 1", "MINIMALDATA", "MINIMALDATA", "1 to 16 minimally represented by OP_1 to OP_16"],
++["0x4c 0x00", "DROP 1", "MINIMALDATA", "MINIMALDATA", "Empty vector minimally represented by ccoin_OP_0"],
++["0x01 0x81", "DROP 1", "MINIMALDATA", "MINIMALDATA", "-1 minimally represented by ccoin_OP_1NEGATE"],
++["0x01 0x01", "DROP 1", "MINIMALDATA", "MINIMALDATA", "1 to 16 minimally represented by ccoin_OP_1 to ccoin_OP_16"],
+ ["0x01 0x02", "DROP 1", "MINIMALDATA", "MINIMALDATA"],
+ ["0x01 0x03", "DROP 1", "MINIMALDATA", "MINIMALDATA"],
+ ["0x01 0x04", "DROP 1", "MINIMALDATA", "MINIMALDATA"],
+diff --git a/test/tx_invalid.json b/test/tx_invalid.json
+index 0651d5f..6a0c972 100644
+--- a/test/tx_invalid.json
++++ b/test/tx_invalid.json
+@@ -15,7 +15,7 @@
+ [[["0000000000000000000000000000000000000000000000000000000000000100", 0, "DUP HASH160 0x14 0x5b6462475454710f3c22f5fdf0b40704c92f25c3 EQUALVERIFY CHECKSIGVERIFY 1 0x4c 0x47 0x3044022067288ea50aa799543a536ff9306f8e1cba05b9c6b10951175b924f96732555ed022026d7b5265f38d21541519e4a1e55044d5b9e17e15cdbaf29ae3792e99e883e7a01"]],
+ "01000000010001000000000000000000000000000000000000000000000000000000000000000000006a473044022067288ea50aa799543a536ff9306f8e1cba05b9c6b10951175b924f96732555ed022026d7b5265f38d21541519e4a1e55044d5b9e17e15cdbaf29ae3792e99e883e7a012103ba8c8b86dea131c22ab967e6dd99bdae8eff7a1f75a2c35f1f944109e3fe5e22ffffffff010000000000000000015100000000", "P2SH"],
+ 
+-["Same as above, but with the sig in the scriptSig also pushed with the same non-standard OP_PUSHDATA"],
++["Same as above, but with the sig in the scriptSig also pushed with the same non-standard ccoin_OP_PUSHDATA"],
+ [[["0000000000000000000000000000000000000000000000000000000000000100", 0, "DUP HASH160 0x14 0x5b6462475454710f3c22f5fdf0b40704c92f25c3 EQUALVERIFY CHECKSIGVERIFY 1 0x4c 0x47 0x3044022067288ea50aa799543a536ff9306f8e1cba05b9c6b10951175b924f96732555ed022026d7b5265f38d21541519e4a1e55044d5b9e17e15cdbaf29ae3792e99e883e7a01"]],
+ "01000000010001000000000000000000000000000000000000000000000000000000000000000000006b4c473044022067288ea50aa799543a536ff9306f8e1cba05b9c6b10951175b924f96732555ed022026d7b5265f38d21541519e4a1e55044d5b9e17e15cdbaf29ae3792e99e883e7a012103ba8c8b86dea131c22ab967e6dd99bdae8eff7a1f75a2c35f1f944109e3fe5e22ffffffff010000000000000000015100000000", "P2SH"],
+ 
+diff --git a/test/tx_valid.json b/test/tx_valid.json
+index 182060b..e4565ac 100644
+--- a/test/tx_valid.json
++++ b/test/tx_valid.json
+@@ -8,27 +8,27 @@
+ ["The following is 23b397edccd3740a74adb603c9756370fafcde9bcc4483eb271ecad09a94dd63"],
+ ["It is of particular interest because it contains an invalidly-encoded signature which OpenSSL accepts"],
+ ["See http://r6.ca/blog/20111119T211504Z.html"],
+-["It is also the first OP_CHECKMULTISIG transaction in standard form"],
+-[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 OP_CHECKMULTISIG"]],
++["It is also the first ccoin_OP_CHECKMULTISIG transaction in standard form"],
++[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 ccoin_OP_CHECKMULTISIG"]],
+ "0100000001b14bdcbc3e01bdaad36cc08e81e69c82e1060bc14e518db2b49aa43ad90ba26000000000490047304402203f16c6f40162ab686621ef3000b04e75418a0c0cb2d8aebeac894ae360ac1e780220ddc15ecdfc3507ac48e1681a33eb60996631bf6bf5bc0a0682c4db743ce7ca2b01ffffffff0140420f00000000001976a914660d4ef3a743e3e696ad990364e555c271ad504b88ac00000000", "P2SH"],
+ 
+ ["The following is a tweaked form of 23b397edccd3740a74adb603c9756370fafcde9bcc4483eb271ecad09a94dd63"],
+-["It is an OP_CHECKMULTISIG with an arbitrary extra byte stuffed into the signature at pos length - 2"],
++["It is an ccoin_OP_CHECKMULTISIG with an arbitrary extra byte stuffed into the signature at pos length - 2"],
+ ["The dummy byte is fine however, so the NULLDUMMY flag should be happy"],
+-[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 OP_CHECKMULTISIG"]],
++[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 ccoin_OP_CHECKMULTISIG"]],
+ "0100000001b14bdcbc3e01bdaad36cc08e81e69c82e1060bc14e518db2b49aa43ad90ba260000000004a0048304402203f16c6f40162ab686621ef3000b04e75418a0c0cb2d8aebeac894ae360ac1e780220ddc15ecdfc3507ac48e1681a33eb60996631bf6bf5bc0a0682c4db743ce7ca2bab01ffffffff0140420f00000000001976a914660d4ef3a743e3e696ad990364e555c271ad504b88ac00000000", "P2SH,NULLDUMMY"],
+ 
+ ["The following is a tweaked form of 23b397edccd3740a74adb603c9756370fafcde9bcc4483eb271ecad09a94dd63"],
+-["It is an OP_CHECKMULTISIG with the dummy value set to something other than an empty string"],
+-[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 OP_CHECKMULTISIG"]],
++["It is an ccoin_OP_CHECKMULTISIG with the dummy value set to something other than an empty string"],
++[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 ccoin_OP_CHECKMULTISIG"]],
+ "0100000001b14bdcbc3e01bdaad36cc08e81e69c82e1060bc14e518db2b49aa43ad90ba260000000004a01ff47304402203f16c6f40162ab686621ef3000b04e75418a0c0cb2d8aebeac894ae360ac1e780220ddc15ecdfc3507ac48e1681a33eb60996631bf6bf5bc0a0682c4db743ce7ca2b01ffffffff0140420f00000000001976a914660d4ef3a743e3e696ad990364e555c271ad504b88ac00000000", "P2SH"],
+ 
+-["As above, but using a OP_1"],
+-[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 OP_CHECKMULTISIG"]],
++["As above, but using a ccoin_OP_1"],
++[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 ccoin_OP_CHECKMULTISIG"]],
+ "0100000001b14bdcbc3e01bdaad36cc08e81e69c82e1060bc14e518db2b49aa43ad90ba26000000000495147304402203f16c6f40162ab686621ef3000b04e75418a0c0cb2d8aebeac894ae360ac1e780220ddc15ecdfc3507ac48e1681a33eb60996631bf6bf5bc0a0682c4db743ce7ca2b01ffffffff0140420f00000000001976a914660d4ef3a743e3e696ad990364e555c271ad504b88ac00000000", "P2SH"],
+ 
+-["As above, but using a OP_1NEGATE"],
+-[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 OP_CHECKMULTISIG"]],
++["As above, but using a ccoin_OP_1NEGATE"],
++[[["60a20bd93aa49ab4b28d514ec10b06e1829ce6818ec06cd3aabd013ebcdc4bb1", 0, "1 0x41 0x04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4 0x41 0x0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af 2 ccoin_OP_CHECKMULTISIG"]],
+ "0100000001b14bdcbc3e01bdaad36cc08e81e69c82e1060bc14e518db2b49aa43ad90ba26000000000494f47304402203f16c6f40162ab686621ef3000b04e75418a0c0cb2d8aebeac894ae360ac1e780220ddc15ecdfc3507ac48e1681a33eb60996631bf6bf5bc0a0682c4db743ce7ca2b01ffffffff0140420f00000000001976a914660d4ef3a743e3e696ad990364e555c271ad504b88ac00000000", "P2SH"],
+ 
+ ["The following is c99c49da4c38af669dea436d3e73780dfdb6c1ecf9958baa52960e8baee30e73"],

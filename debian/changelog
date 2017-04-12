@@ -1,6 +1,6 @@
-picocoin (0.5-2~2.gbpf9e6aa) UNRELEASED; urgency=medium
+picocoin (0.5-2~3.gbp2cf319) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @f9e6aaa92eb92baac41ed59827540aae30b52500 **
+  ** SNAPSHOT build @2cf319db0edbb1d8fdec91a31a8538411f1c15be **
 
   [ Aido ]
   * libsecp256k1: Add libsecp256k1 as a submodule
@@ -92,6 +92,11 @@ picocoin (0.5-2~2.gbpf9e6aa) UNRELEASED; urgency=medium
   * incrementing version number
   * fixing diffs
   * fixing unnecessary linking issues
+
+  [ Joel De Jesus ]
+
+  [ Joel DeJesus ]
+  * upgrading to version 0.5
 
   [ Joel De Jesus ]
 
