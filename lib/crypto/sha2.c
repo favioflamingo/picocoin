@@ -70,7 +70,7 @@
  *
  * And for little-endian machines, add:
  *
- *   #define BYTE_ORDER LITTLE_ENDIAN 
+ *   #define BYTE_ORDER LITTLE_ENDIAN
  *
  * Or for big-endian machines:
  *
@@ -425,11 +425,11 @@ void sha256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 		/* Part of the message block expansion: */
 		s0 = W256[(j+1)&0x0f];
 		s0 = sigma0_256(s0);
-		s1 = W256[(j+14)&0x0f];	
+		s1 = W256[(j+14)&0x0f];
 		s1 = sigma1_256(s1);
 
 		/* Apply the SHA-256 compression function to update a..h */
-		T1 = h + Sigma1_256(e) + Ch(e, f, g) + K256[j] + 
+		T1 = h + Sigma1_256(e) + Ch(e, f, g) + K256[j] +
 		     (W256[j&0x0f] += s1 + W256[(j+9)&0x0f] + s0);
 		T2 = Sigma0_256(a) + Maj(a, b, c);
 		h = g;
@@ -460,7 +460,8 @@ void sha256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 
 #endif /* SHA2_UNROLL_TRANSFORM */
 
-void sha256_Update(SHA256_CTX* context, const sha2_byte *data, size_t len) {
+void sha256_Update(SHA256_CTX* context, const void *data_p, size_t len) {
+	const sha2_byte *data = data_p;
 	unsigned int	freespace, usedspace;
 
 	if (len == 0) {
@@ -586,14 +587,14 @@ char *sha256_End(SHA256_CTX* context, char buffer[]) {
 	return buffer;
 }
 
-void sha256_Raw(const sha2_byte* data, size_t len, uint8_t digest[SHA256_DIGEST_LENGTH]) {
+void sha256_Raw(const void* data, size_t len, uint8_t digest[SHA256_DIGEST_LENGTH]) {
 	SHA256_CTX	context;
 	sha256_Init(&context);
 	sha256_Update(&context, data, len);
 	sha256_Final(digest, &context);
 }
 
-char* sha256_Data(const sha2_byte* data, size_t len, char digest[SHA256_DIGEST_STRING_LENGTH]) {
+char* sha256_Data(const void* data, size_t len, char digest[SHA256_DIGEST_STRING_LENGTH]) {
 	SHA256_CTX	context;
 
 	sha256_Init(&context);
@@ -781,7 +782,8 @@ void sha512_Transform(SHA512_CTX* context, const sha2_word64* data) {
 
 #endif /* SHA2_UNROLL_TRANSFORM */
 
-void sha512_Update(SHA512_CTX* context, const sha2_byte *data, size_t len) {
+void sha512_Update(SHA512_CTX* context, const void *data_p, size_t len) {
+	const sha2_byte *data = data_p;
 	unsigned int	freespace, usedspace;
 
 	if (len == 0) {
@@ -916,14 +918,14 @@ char *sha512_End(SHA512_CTX* context, char buffer[]) {
 	return buffer;
 }
 
-void sha512_Raw(const sha2_byte* data, size_t len, uint8_t digest[SHA512_DIGEST_LENGTH]) {
+void sha512_Raw(const void* data, size_t len, uint8_t digest[SHA512_DIGEST_LENGTH]) {
 	SHA512_CTX	context;
 	sha512_Init(&context);
 	sha512_Update(&context, data, len);
 	sha512_Final(digest, &context);
 }
 
-char* sha512_Data(const sha2_byte* data, size_t len, char digest[SHA512_DIGEST_STRING_LENGTH]) {
+char* sha512_Data(const void* data, size_t len, char digest[SHA512_DIGEST_STRING_LENGTH]) {
 	SHA512_CTX	context;
 
 	sha512_Init(&context);

@@ -72,12 +72,14 @@ cstring *message_str(const unsigned char netmagic[4],
 bool deser_msg_addr(unsigned int protover, struct msg_addr *ma,
 		    struct const_buffer *buf)
 {
-	memset(ma, 0, sizeof(*ma));
+	msg_addr_free(ma);
 
 	uint32_t vlen;
 	if (!deser_varlen(&vlen, buf)) return false;
 
-	ma->addrs = parr_new(vlen, free);
+	ma->addrs = parr_new(vlen, bp_addr_freep);
+	if (!ma->addrs)
+		return false;
 
 	unsigned int i;
 	for (i = 0; i < vlen; i++) {
@@ -124,6 +126,9 @@ cstring *ser_msg_addr(unsigned int protover, const struct msg_addr *ma)
 
 void msg_addr_free(struct msg_addr *ma)
 {
+	if (!ma)
+		return;
+
 	if (ma->addrs) {
 		parr_free(ma->addrs, true);
 		ma->addrs = NULL;
@@ -156,7 +161,7 @@ bool deser_msg_headers(struct msg_headers *mh, struct const_buffer *buf)
 	uint32_t vlen;
 	if (!deser_varlen(&vlen, buf)) return false;
 
-	mh->headers = parr_new(vlen, free);
+	mh->headers = parr_new(vlen, bp_block_freep);
 
 	unsigned int i;
 	for (i = 0; i < vlen; i++) {
@@ -207,15 +212,6 @@ void msg_headers_free(struct msg_headers *mh)
 		return;
 
 	if (mh->headers) {
-		unsigned int i;
-
-		for (i = 0; i < mh->headers->len; i++) {
-			struct bp_block *block;
-
-			block = parr_idx(mh->headers, i);
-			bp_block_free(block);
-		}
-
 		parr_free(mh->headers, true);
 		mh->headers = NULL;
 	}
@@ -299,7 +295,7 @@ bool deser_msg_vinv(struct msg_vinv *mv, struct const_buffer *buf)
 	uint32_t vlen;
 	if (!deser_varlen(&vlen, buf)) return false;
 
-	mv->invs = parr_new(vlen, free);
+	mv->invs = parr_new(vlen, bp_inv_freep);
 
 	unsigned int i;
 	for (i = 0; i < vlen; i++) {
@@ -359,7 +355,7 @@ void msg_vinv_push(struct msg_vinv *mv, uint32_t msg_type,
 		   const bu256_t *hash_in)
 {
 	if (!mv->invs)
-		mv->invs = parr_new(512, free);
+		mv->invs = parr_new(512, bp_inv_freep);
 
 	struct bp_inv *inv = malloc(sizeof(struct bp_inv));
 	inv->type = msg_type;

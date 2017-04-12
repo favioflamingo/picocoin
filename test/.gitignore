@@ -12,6 +12,7 @@ clist
 cstr
 ctaes
 coredefs
+crypto
 fileio
 hash
 hashtab
@@ -21,7 +22,10 @@ keyset
 keystore
 mbr
 message
+misc
+net
 parr
+prng
 script
 script-parse
 tx

@@ -12,6 +12,7 @@
 #include <ccoin/buffer.h>               // for const_buffer
 #include <ccoin/coredefs.h>             // for chain_info
 #include <ccoin/crypto/aes_util.h>      // for read_aes_file, etc
+#include <ccoin/crypto/prng.h>          // for prng_get_random_bytes
 #include <ccoin/cstr.h>                 // for cstring, cstr_free, etc
 #include <ccoin/hdkeys.h>               // for hd_extended_key_ser_priv
 #include <ccoin/hexcode.h>              // for encode_hex
@@ -21,7 +22,6 @@
 #include <ccoin/compat.h>               // for parr_new
 
 #include <jansson.h>                    // for json_object_set_new, etc
-#include <openssl/rand.h>               // for RAND_bytes
 
 #include <assert.h>                     // for assert
 #include <stdbool.h>                    // for true, bool, false
@@ -196,7 +196,10 @@ void cur_wallet_create(void)
 	}
 
 	char seed[256];
-	RAND_bytes((unsigned char *) &seed[0], sizeof(seed));
+	if (prng_get_random_bytes((unsigned char *) &seed[0], sizeof(seed)) < 0) {
+		fprintf(stderr, "wallet: no random data available\n");
+		return;
+	}
 
 	char seed_str[(sizeof(seed) * 2) + 1];
 	encode_hex(seed_str, seed, sizeof(seed));
@@ -283,34 +286,29 @@ static void wallet_dump_keys(json_t *keys_a, struct wallet *wlt)
 
 	wallet_for_each_key(wlt, key) {
 
-		void *privkey = NULL, *pubkey = NULL;
-		size_t priv_len = 0, pub_len = 0;
 		json_t *o = json_object();
 
-		if (!bp_privkey_get(key, &privkey, &priv_len)) {
+		void *privkey = NULL;
+		size_t priv_len = 0;
+		if (bp_privkey_get(key, &privkey, &priv_len)) {
+			cstring *privkey_str = str2hex(privkey, priv_len);
+			json_object_set_new(o, "privkey", json_string(privkey_str->str));
+			cstr_free(privkey_str, true);
 			free(privkey);
 			privkey = NULL;
-			priv_len = 0;
 		}
 
-		if (priv_len) {
-			char *privkey_str = calloc(1, (priv_len * 2) + 1);
-			encode_hex(privkey_str, privkey, priv_len);
-			json_object_set_new(o, "privkey", json_string(privkey_str));
-			free(privkey_str);
-			free(privkey);
-		}
-
+		void *pubkey = NULL;
+		size_t pub_len = 0;
 		if (!bp_pubkey_get(key, &pubkey, &pub_len)) {
 			json_decref(o);
 			continue;
 		}
 
-		if (pub_len) {
-			char *pubkey_str = calloc(1, (pub_len * 2) + 1);
-			encode_hex(pubkey_str, pubkey, pub_len);
-			json_object_set_new(o, "pubkey", json_string(pubkey_str));
-			free(pubkey_str);
+		if (pubkey) {
+			cstring *pubkey_str = str2hex(pubkey, pub_len);
+			json_object_set_new(o, "pubkey", json_string(pubkey_str->str));
+			cstr_free(pubkey_str, true);
 
 			cstring *btc_addr = bp_pubkey_get_address(key, chain->addr_pubkey);
 			json_object_set_new(o, "address", json_string(btc_addr->str));

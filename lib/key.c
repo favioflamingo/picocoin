@@ -5,12 +5,15 @@
  */
 
 #include "picocoin-config.h"
-#include <ccoin/key.h>
 
-#include <lax_der_privatekey_parsing.c>
+
+#include <ccoin/key.h>                  // for bp_key
+#include <ccoin/crypto/prng.h>          // for prng_get_random_bytes
+
 #include <lax_der_parsing.c>
-#include <openssl/rand.h>
-#include <string.h>
+#include <lax_der_privatekey_parsing.c>  // for ec_privkey_export_der, etc
+
+#include <string.h>                     // for NULL, memcpy, memset
 
 static secp256k1_context *s_context = NULL;
 secp256k1_context *get_secp256k1_context()
@@ -24,8 +27,8 @@ secp256k1_context *get_secp256k1_context()
 		}
 
 		uint8_t seed[32];
-		if (!RAND_bytes(seed, sizeof(seed)) ||
-		    !secp256k1_context_randomize(ctx, seed)) {
+		if ((prng_get_random_bytes(seed, sizeof(seed)) < 0) ||
+			!secp256k1_context_randomize(ctx, seed)) {
 			secp256k1_context_destroy(ctx);
 			return NULL;
 		}
@@ -44,10 +47,9 @@ void bp_key_static_shutdown()
 	}
 }
 
-bool bp_key_init(struct bp_key *key)
+void bp_key_init(struct bp_key *key)
 {
-	memset(key->secret, 0, sizeof(key->secret));
-	return true;
+	memset(key, 0, sizeof(*key));
 }
 
 void bp_key_free(struct bp_key *key)
@@ -65,7 +67,7 @@ bool bp_key_generate(struct bp_key *key)
 	// secret is valid).
 
 	do {
-		if (!RAND_bytes(key->secret, (int )sizeof(key->secret))) {
+		if (prng_get_random_bytes(key->secret, (int )sizeof(key->secret)) < 0) {
 			return false;
 		}
 	} while (!secp256k1_ec_pubkey_create(ctx, &key->pubkey, key->secret));
@@ -119,6 +121,9 @@ bool bp_key_secret_set(struct bp_key *key, const void *privkey_, size_t pk_len)
 
 bool bp_privkey_get(const struct bp_key *key, void **privkey, size_t *pk_len)
 {
+	*privkey = NULL;
+	*pk_len = 0;
+
 	secp256k1_context *ctx = get_secp256k1_context();
 	if (!ctx) {
 		return false;
@@ -139,6 +144,9 @@ bool bp_privkey_get(const struct bp_key *key, void **privkey, size_t *pk_len)
 
 bool bp_pubkey_get(const struct bp_key *key, void **pubkey, size_t *pk_len)
 {
+	*pubkey = NULL;
+	*pk_len = 0;
+
 	secp256k1_context *ctx = get_secp256k1_context();
 	if (!ctx) {
 		return false;
@@ -194,8 +202,11 @@ bool bp_pubkey_checklowS(const void *sig_, size_t sig_len)
 }
 
 bool bp_sign(const struct bp_key *key, const void *data, size_t data_len,
-	     void **sig_, size_t *sig_len_)
+	     void **sig_out, size_t *sig_len_out)
 {
+	*sig_out = NULL;
+	*sig_len_out = 0;
+
 	secp256k1_ecdsa_signature sig;
 
 	if (32 != data_len) {
@@ -219,15 +230,18 @@ bool bp_sign(const struct bp_key *key, const void *data, size_t data_len,
 		return false;
 	}
 
-	*sig_ = malloc(72);
-	*sig_len_ = 72;
+	size_t sig_len = 72;
+	void *sig_p = malloc(sig_len);
+	if (!sig_p)
+		return false;
 
-	if (!secp256k1_ecdsa_signature_serialize_der(ctx, *sig_, sig_len_, &sig)) {
-		free(sig_);
-		*sig_ = NULL;
+	if (!secp256k1_ecdsa_signature_serialize_der(ctx, sig_p, &sig_len, &sig)) {
+		free(sig_p);
 		return false;
 	}
 
+	*sig_out = sig_p;
+	*sig_len_out = sig_len;
 	return true;
 }
 

@@ -10,6 +10,7 @@
 #include <ccoin/clist.h>                // for clist_length
 #include <ccoin/core.h>                 // for bp_block, bp_utxo, bp_tx, etc
 #include <ccoin/coredefs.h>             // for chain_info, chain_find, etc
+#include <ccoin/crypto/prng.h>          // for prng_get_random_bytes
 #include <ccoin/cstr.h>                 // for cstring, cstr_free
 #include <ccoin/hexcode.h>              // for decode_hex
 #include <ccoin/log.h>                  // for log_info, logging, etc
@@ -21,13 +22,13 @@
 #include <ccoin/script.h>               // for bp_verify_sig
 #include <ccoin/util.h>                 // for ARRAY_SIZE, czstr_equal, etc
 
+
 #include <assert.h>                     // for assert
 #include <stdbool.h>                    // for bool
 #include <ctype.h>                      // for isspace
 #include <errno.h>                      // for errno
 #include <event2/event.h>               // for event_base_dispatch, etc
 #include <fcntl.h>                      // for open
-#include <openssl/rand.h>               // for RAND_bytes
 #include <signal.h>                     // for signal, SIG_IGN, SIGHUP, etc
 #include <stddef.h>                     // for size_t
 #include <stdio.h>                      // for fprintf, NULL, fclose, etc
@@ -364,8 +365,10 @@ static bool spend_tx(struct bp_utxo_set *uset, const struct bp_tx *tx,
 	coin = calloc(1, sizeof(*coin));
 	bp_utxo_init(coin);
 
-	if (!bp_utxo_from_tx(coin, tx, is_coinbase, height))
+	if (!bp_utxo_from_tx(coin, tx, is_coinbase, height)) {
+		bp_utxo_freep(coin);
 		return false;
+	}
 
 	/* add unspent outputs to set */
 	bp_utxo_set_add(uset, coin);
@@ -516,7 +519,7 @@ static void readprep_blocks_file(void)
 static void init_orphans(void)
 {
 	orphans = bp_hashtab_new_ext(bu256_hash, bu256_equal_,
-				     (bp_freefunc) bu256_free, (bp_freefunc) buffer_free);
+				     bu256_freep, buffer_freep);
 }
 
 static bool have_orphan(const bu256_t *v)
@@ -537,7 +540,7 @@ static bool add_orphan(const bu256_t *hash_in, struct const_buffer *buf_in)
 
 	struct buffer *buf = buffer_copy(buf_in->p, buf_in->len);
 	if (!buf) {
-		bu256_free(hash);
+		bu256_freep(hash);
 		log_info("%s: OOM", prog_name);
 		return false;
 	}
@@ -706,7 +709,10 @@ int main (int argc, char *argv[])
 	if (!preload_settings())
 		return 1;
 
-	RAND_bytes((unsigned char *)&instance_nonce, sizeof(instance_nonce));
+	if (prng_get_random_bytes((unsigned char *)&instance_nonce, sizeof(instance_nonce)) < 0) {
+		fprintf(stderr, "brd: no random data available\n");
+		return 1;
+	};
 
 	unsigned int arg;
 	for (arg = 1; arg < argc; arg++) {

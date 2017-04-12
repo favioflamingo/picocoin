@@ -92,7 +92,7 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
 	if ((nHashType & 0x1f) == SIGHASH_NONE) {
 		/* Wildcard payee */
 		bp_tx_free_vout(&txTmp);
-		txTmp.vout = parr_new(1, bp_txout_free_cb);
+		txTmp.vout = parr_new(1, bp_txout_freep);
 
 		/* Let the others update at will */
 		for (i = 0; i < txTmp.vin->len; i++) {
@@ -596,7 +596,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 	struct bscript_op op;
 	bool rc = false;
 	cstring *vfExec = cstr_new(NULL);
-	parr *altstack = parr_new(0, buffer_free);
+	parr *altstack = parr_new(0, buffer_freep);
 	mpz_t bn;
 	mpz_init(bn);
 
@@ -728,7 +728,7 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 			if (mpz_sgn(bn) < 0)
 				goto out;
 
-			uint64_t nSequence = mpz_get_ui(bn);
+			uint32_t nSequence = mpz_get_ui(bn);
 
 			// To provide for future soft-fork extensibility, if the
 			// operand has the disabled lock-time flag set,
@@ -1326,12 +1326,15 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 				struct buffer *vchSig	= stacktop(stack, -isig);
 				struct buffer *vchPubKey = stacktop(stack, -ikey);
 
-				// Check signature
+				// Note how this makes the exact order of pubkey/signature evaluation
+				// distinguishable by CHECKMULTISIG NOT if the STRICTENC flag is set.
+				// See the script_(in)valid tests for details.
 				if (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey, flags)) {
 					cstr_free(scriptCode, true);
 					goto out;
 				}
 
+				// Check signature
 				bool fOk = bp_checksig(vchSig, vchPubKey,
 							  scriptCode, txTo, nIn,
 							  nHashType);
@@ -1351,8 +1354,22 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 
 			cstr_free(scriptCode, true);
 
-			while (i-- > 0)
+			// Clean up stack of actual arguments
+			while (i-- > 1)
 				popstack(stack);
+
+			// A bug causes CHECKMULTISIG to consume one extra argument
+			// whose contents were not checked in any way.
+			//
+			// Unfortunately this is a potential source of mutability,
+			// so optionally verify it is exactly equal to zero prior
+			// to removing it from the stack.
+			if ((int)stack->len < 1)
+				goto out;
+			if ((flags & SCRIPT_VERIFY_NULLDUMMY) && stacktop(stack, -1)->len)
+				goto out;
+			popstack(stack);
+
 			stack_push_char(stack, fSuccess ? 1 : 0);
 
 			if (opcode == OP_CHECKMULTISIGVERIFY)
@@ -1387,7 +1404,7 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		      unsigned int flags, int nHashType)
 {
 	bool rc = false;
-	parr *stack = parr_new(0, buffer_free);
+	parr *stack = parr_new(0, buffer_freep);
 	parr *stackCopy = NULL;
 
 	struct const_buffer sigbuf = { scriptSig->str, scriptSig->len };
@@ -1398,7 +1415,7 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		goto out;
 
 	if (flags & SCRIPT_VERIFY_P2SH) {
-		stackCopy = parr_new(stack->len, buffer_free);
+		stackCopy = parr_new(stack->len, buffer_freep);
 		stack_copy(stackCopy, stack);
 	}
 
@@ -1421,7 +1438,7 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 
 		cstring *pubkey2 = cstr_new_buf(pubkey2_buf->p, pubkey2_buf->len);
 
-		buffer_free(pubkey2_buf);
+		buffer_freep(pubkey2_buf);
 
 		bool rc2 = bp_script_eval(stackCopy, pubkey2, txTo, nIn,
 					  flags, nHashType);

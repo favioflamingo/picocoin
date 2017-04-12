@@ -21,21 +21,21 @@ EXTRA_DIST	= \
 
 noinst_LIBRARIES= libtest.a
 
-libtest_a_SOURCES= libtest.h libtest.c
+libtest_a_SOURCES= libtest.h libtest.c chisq.c randtest.c
 
 noinst_PROGRAMS	= clist cstr coredefs hex hdkeys hashtab base58 fileio util \
-		  keystore keyset bloom mbr \
-		  message parr script-parse tx block blockfile blkdb script \
+		  crypto keystore keyset bloom mbr misc net \
+		  message parr prng script-parse tx block blockfile blkdb script \
 		  tx-valid wallet wallet-basics chain-verf hash ctaes aes-util
 
 TESTS		= clist cstr coredefs hex hdkeys hashtab base58 fileio util \
-		  keystore keyset bloom mbr \
-		  message parr script-parse tx block blockfile blkdb script \
+		  crypto keystore keyset bloom mbr misc net \
+		  message parr prng script-parse tx block blockfile blkdb script \
 		  tx-valid wallet wallet-basics chain-verf hash ctaes aes-util
 
 COMMON_LDADD	= libtest.a $(top_builddir)/lib/libccoin.la \
 		  $(top_builddir)/external/secp256k1/libsecp256k1.la \
-		  @CRYPTO_LIBS@ @GMP_LIBS@ @JANSSON_LIBS@ @MATH_LIBS@
+		  @GMP_LIBS@ @JANSSON_LIBS@ @MATH_LIBS@
 
 base58_LDADD        = $(COMMON_LDADD)
 blkdb_LDADD         = $(COMMON_LDADD)
@@ -48,6 +48,7 @@ cstr_LDADD		    = $(COMMON_LDADD)
 coredefs_LDADD		    = $(COMMON_LDADD)
 ctaes_LDADD         = $(COMMON_LDADD) $(top_builddir)/lib/libccoinaes.la
 aes_util_LDADD		= $(COMMON_LDADD) $(top_builddir)/lib/libccoinaes.la
+crypto_LDADD		= $(COMMON_LDADD)
 fileio_LDADD		= $(COMMON_LDADD)
 hash_LDADD		= $(COMMON_LDADD)
 hex_LDADD           = $(COMMON_LDADD)
@@ -57,7 +58,10 @@ keyset_LDADD		= $(COMMON_LDADD)
 keystore_LDADD		= $(COMMON_LDADD)
 mbr_LDADD		= $(COMMON_LDADD)
 message_LDADD		= $(COMMON_LDADD)
+misc_LDADD		= $(COMMON_LDADD)
+net_LDADD		= $(COMMON_LDADD) $(top_builddir)/lib/libccoinnet.la
 parr_LDADD		    = $(COMMON_LDADD)
+prng_LDADD		    = $(COMMON_LDADD)
 script_LDADD		= $(COMMON_LDADD)
 script_parse_LDADD	= $(COMMON_LDADD)
 tx_LDADD            = $(COMMON_LDADD)
