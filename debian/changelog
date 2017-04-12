@@ -1,6 +1,6 @@
-picocoin (0.2-2~1.gbp06cc18) UNRELEASED; urgency=medium
+picocoin (0.5-2~2.gbpf9e6aa) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @06cc189013b96320a88bacd0399c8246e2b1f871 **
+  ** SNAPSHOT build @f9e6aaa92eb92baac41ed59827540aae30b52500 **
 
   [ Aido ]
   * libsecp256k1: Add libsecp256k1 as a submodule
@@ -32,6 +32,68 @@ picocoin (0.2-2~1.gbp06cc18) UNRELEASED; urgency=medium
   [ Joel Manuel De Jesus ]
   * changing operator names
   * fixing configure.ac error
+
+  [ libbitc ]
+  * ccoin: Added SCRIPT_VERIFY_LOW_S functionality
+  * ccoin: Added IsDefinedHashtypeSignature functionality
+  * ccoin: Added check for invalid use of SIGHASH_SINGLE
+  * test: Introduce verification flags to tx test files
+  * ccoin: Added SCRIPT_VERIFY_SIGPUSHONLY test flag
+  * ccoin: Added SCRIPT_VERIFY_MINIMALDATA test flag and checks
+  * ccoin: Added SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS test flag
+  * ccoin: Added SCRIPT_VERIFY_CLEANSTACK test flag
+  * ccoin: Added OP_CHECKLOCKTIMEVERIFY and tests
+  * ccoin: Added OP_CHECKSEQUENCEVERIFY and tests
+
+  [ Aido ]
+  * ccoin: Add a simple logging framework
+  * travis: Add 'brew upgrade' command to .travis.yml glibtoolize is giving a '/usr/local/Library/ENV/4.3/sed: No such file or directory' error on OSX
+  * net: Replace instances of perror() with log_error()
+  * brd: Include sys/uio.h in brd.c Fixes clang warning: implicit declaration of function 'writev' is invalid in C99 [-Wimplicit-function-declaration]
+
+  [ Duncan Tebbs ]
+  * ccoin: Add SHA and HMAC code, replacing OpenSSL calls
+  * ccoin: Added ripemd160 code, replacing OpenSSL calls
+
+  [ Aido ]
+  * ccoin: Added AES code, replacing OpenSSL calls
+
+  [ Jeff Garzik ]
+  * hexcode: add str2hex() helper
+  * picocoin: Generate and store hd master extended keys (BIP 32)
+  * wallet fix: correct destructors for parr arrays
+  * picocoin/wallet: Generate new addresses via HD derivation (BIP32/44)
+  * lib/hdkeys: Add hd_derive() helper for building multi-segment HD paths
+  * wallet: Use hd_derive() when generating new addresses
+  * wallet: add HD key info to wallet-info command output
+  * blkstats, rawtx: trim trailing whitespace (cosmetic)
+  * picocoin: Add internal concept of accounts (BIP 44-style)
+  * picocoin: save and restore "default account" setting
+  * configure.ac: update jgarzik email address
+  * brd: eliminate unused var
+  * net: move static declarations out of public header file
+  * src/wallet: use RAND_bytes() for obtaining HD master seed
+  * picocoin: Rewrite command line processing to use argp
+  * test/tx-valid: remove unused (shadowed) var
+  * picocoin/wallet: Complete multi-account support
+  * picocoin: list-settings and --help cleanup
+  * README: update picocoin cmd line docs
+  * Remove remaining references to now-dead exmulti.com.
+  * README: indicate notable components
+  * Increase misc. test coverage.
+  * Increase file I/O, hashtab test coverage.
+  * Add simple keystore unit test
+  * Add simple test for mbr module.
+  * test/mbr: fix memory leak
+  * lib/wallet: remove duplicate code
+  * Release version 0.5.
+
+  [ Joel DeJesus ]
+  * incrementing version number
+  * fixing diffs
+  * fixing unnecessary linking issues
+
+  [ Joel De Jesus ]
 
  -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Wed, 12 Apr 2017 08:21:09 +0900
 
