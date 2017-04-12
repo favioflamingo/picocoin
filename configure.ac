@@ -17,7 +17,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-AC_INIT([picocoin], 0.1git, [Jeff Garzik <jgarzik@exmulti.com>])
+AC_INIT([picocoin], 0.5, [Jeff Garzik <jgarzik@pobox.com>])
 AC_PREREQ(2.60)
 LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
@@ -103,7 +103,7 @@ AS_IF([test "$enable_coverage" = "yes"], [
 	AC_PATH_PROG(LCOV, lcov, no)
 	AS_IF([test "$LCOV" = "no"], [
 		AC_MSG_ERROR(lcov tool is not installed)])
-	CFLAGS="$CFLAGS -O0 -fprofile-arcs -ftest-coverage"
+	CFLAGS="-O0 -fprofile-arcs -ftest-coverage"
 ])
 
 dnl Valgrind
