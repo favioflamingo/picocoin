@@ -11,7 +11,7 @@ Vcs-Browser: https://github.com/favioflamingo/picocoin
 Package: libccoin-dev
 Section: libdevel
 Architecture: any
-Depends: libccoin0 (= ${binary:Version}), ${misc:Depends}
+Depends: libccoin0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
 Recommends: picocoin
 Description: bitcoin library - development files
  This package contains headers for bitcoin c functions 

@@ -1,1 +1,5 @@
 usr/bin/picocoin
+usr/bin/rawtx
+usr/bin/blkstats
+usr/bin/blkscan
+usr/bin/brd
