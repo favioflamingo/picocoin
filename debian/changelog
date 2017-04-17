@@ -1,6 +1,4 @@
-picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
-
-  ** SNAPSHOT build @a7843ed53b57db9417ee21731c81398972b5e6df **
+picocoin (0.5-2) jessie; urgency=medium
 
   [ Aido ]
   * libsecp256k1: Add libsecp256k1 as a submodule
@@ -12,22 +10,6 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * configure.ac: explicitly include /usr/local libs (fixes build errors in latest xcode)
   * ccoin: switch to secp256k1 lib for most key operations
   * configure.ac: dont run secp256k1 tests by default
-
-  [ Aido ]
-  * configure.ac: Added subdir-objects to AM_INIT_AUTOMAKE
-  * secp256k1: Update to latest version of secp256k1
-  * configure.ac: Remove workaround for secp256k1 jni being enabled in distcheck
-
-  [ libbitc ]
-  * ccoin: Added SCRIPT_VERIFY_LOW_S functionality
-  * ccoin: Added IsDefinedHashtypeSignature functionality
-  * ccoin: Added check for invalid use of SIGHASH_SINGLE
-
-  [ Aido ]
-  * ccoin: Add a simple logging framework
-  * travis: Add 'brew upgrade' command to .travis.yml glibtoolize is giving a '/usr/local/Library/ENV/4.3/sed: No such file or directory' error on OSX
-  * net: Replace instances of perror() with log_error()
-  * brd: Include sys/uio.h in brd.c Fixes clang warning: implicit declaration of function 'writev' is invalid in C99 [-Wimplicit-function-declaration]
 
   [ Duncan Tebbs ]
   * ccoin: Add SHA and HMAC code, replacing OpenSSL calls
@@ -44,48 +26,19 @@ picocoin (0.5-2~4.gbpa7843e) UNRELEASED; urgency=medium
   * lib/hdkeys: Add hd_derive() helper for building multi-segment HD paths
   * Release version 0.5.
 
-  [ Joel DeJesus ]
-  * incrementing version number
-  * fixing diffs
-  * fixing unnecessary linking issues
-
-  [ Joel De Jesus ]
-
-  [ Joel DeJesus ]
-  * upgrading to version 0.5
-
-  [ Joel De Jesus ]
-
-  [ Jeff Garzik ]
-  * travis: add coverity scan
-  * travis: disable failing coverity cert request
-  * include/ccoin/log.h: cosmetic - shorten macro lines to fit on one screen line
-
-
-  [ libbitc ]
-  * Makefile.am: Add pkg-deb make target for creating Debian packages
-
   [ Jeff Garzik ]
   * [test] cstr, parr: improve code coverage by testing edge cases
   * [lib] key and ext-key init need not return a value
-
-  [ libbitc ]
-  * ccoin: Added SCRIPT_VERIFY_NULLDUMMY test flag and script tests
 
   [ Aido ]
   * crypto: AES utility tidy up
   * travis: Remove time consuming 'brew update' command 'brew update' was added as part of #83 to fix a glibtoolize error and failing OSX build. Travis now defaults to a more recent version of OSX containing the newer working version of glibtoolize.
 
-  [ libbitc ]
-  * ccoin: Fix failing CSV tests
-
   [ Joel DeJesus ]
   * prepending operator names for version 0.5
   * updating soname
-  * updating patches to upstream HEAD
-  * readding debian control files
 
- -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Wed, 12 Apr 2017 08:21:09 +0900
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Mon, 17 Apr 2017 23:09:55 +0900
 
 picocoin (0.2-1) jessie; urgency=medium
 
