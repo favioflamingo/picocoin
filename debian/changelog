@@ -1,3 +1,28 @@
+picocoin (0.5-3~1.gbp5e87e4) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @5e87e4f5e0b49f947387418eecf18c3c82c85034 **
+
+  [ libbitc ]
+  * ccoin: OP_0 and bools must have identical byte representations
+
+  [ Joel DeJesus ]
+  * fixing operator names
+  * getting armhf patch
+
+  [ libbitc ]
+  * ccoin: Find-and-delete OP_CODESEPARATOR from scriptCode
+  * tests: Fix issue with failing OP_CHECKSIG test Crediting transaction in tests/script.c was not in correct format
+  * ccoin: Fix issue with CLEANSTACK tests
+  * tests: Added several tx tests Copied tx tests from bitcoin core 0.12 and made some fixes so all tests pass
+  * tests: Added base58 tests Copied base58_keys_invalid.json tests from bitcoin-core 0.12
+  * tests: Added sighash tests Copied sighash tests from bitcoin core 0.12 and made some fixes so all tests pass
+  * tests: Move test data into its own 'test/data' subdirectory
+
+  [ Joel DeJesus ]
+  * uahf code sighash modification passes test from bitcoin-abc
+
+ -- Joel DeJesus <dejesus.joel@e-flamingo.jp>  Tue, 12 Sep 2017 19:23:02 +0900
+
 picocoin (0.5-2) jessie; urgency=medium
 
   [ Aido ]

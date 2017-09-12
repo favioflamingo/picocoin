@@ -1,7 +1,7 @@
 Source: picocoin
 Priority: optional
 Maintainer: Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>
-Build-Depends: debhelper (>= 9.0 ),  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev
+Build-Depends: debhelper (>= 9.0 ),  libcrypto++-dev, libevent-dev, libjansson-dev, libc6-dev (>=2.19), valgrind, dh-autoreconf, libssl-dev, libgmp-dev, autotools-dev, dh-autoreconf
 Standards-Version: 3.9.8
 Section: libs
 Homepage: https://github.com/favioflamingo/picocoin
