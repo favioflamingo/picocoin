@@ -1,12 +1,10 @@
-picocoin (0.5-3~1.gbp5e87e4) UNRELEASED; urgency=medium
-
-  ** SNAPSHOT build @5e87e4f5e0b49f947387418eecf18c3c82c85034 **
+picocoin (0.5-4) jessie; urgency=medium
 
   [ libbitc ]
   * ccoin: OP_0 and bools must have identical byte representations
 
   [ Joel DeJesus ]
-  * fixing operator names
+  * fixing operator names to avoid conflict with perl-dev
   * getting armhf patch
 
   [ libbitc ]
@@ -20,8 +18,12 @@ picocoin (0.5-3~1.gbp5e87e4) UNRELEASED; urgency=medium
 
   [ Joel DeJesus ]
   * uahf code sighash modification passes test from bitcoin-abc
+  * updating control file and change log
+  * updated patches to work with perl modules
+  * updating prefix on script.h
+  * fixing ccoin_ prefix and adding UAHF support
 
- -- Joel DeJesus <dejesus.joel@e-flamingo.jp>  Tue, 12 Sep 2017 19:23:02 +0900
+ -- Joel DeJesus <dejesus.joel@e-flamingo.jp>  Thu, 28 Sep 2017 22:42:43 +0900
 
 picocoin (0.5-2) jessie; urgency=medium
 
