@@ -1,0 +1,21 @@
+From: Joel DeJesus <dejesus.joel@e-flamingo.jp>
+Date: Wed, 12 Apr 2017 12:53:04 +0900
+Subject: updating soname
+
+---
+ lib/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 707c73b..8765fe8 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -54,6 +54,8 @@ libccoin_la_SOURCES=	\
+ 	utxo.c		\
+ 	wallet.c
+ 
++libccoin_la_LDFLAGS = -module -shared  -version-info 0:5:0
++
+ noinst_LTLIBRARIES= libccoinnet.la libccoinaes.la
+ 
+ libccoinnet_la_SOURCES=	\
