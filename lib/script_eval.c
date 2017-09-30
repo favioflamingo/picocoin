@@ -345,10 +345,10 @@ static unsigned int count_false(cstring *vfExec)
 	return count;
 }
 
-static bool bp_checksig(const struct buffer *vchSigIn,
+static bool bp_checksig_with_value(const struct buffer *vchSigIn,
 			const struct buffer *vchPubKey,
 			const cstring *scriptCode,
-			const struct bp_tx *txTo, unsigned int nIn)
+			const struct bp_tx *txTo, unsigned int nIn,int64_t amount)
 {
 	if (!vchSigIn || !vchPubKey || !scriptCode || !txTo ||
 	    !vchSigIn->len || !vchPubKey->len || !scriptCode->len)
@@ -361,7 +361,7 @@ static bool bp_checksig(const struct buffer *vchSigIn,
 
 	/* calculate signature hash of transaction */
 	bu256_t sighash;
-	bp_tx_sighash(&sighash, scriptCode, txTo, nIn, nHashType);
+	bp_tx_sighash_with_value(&sighash, scriptCode, txTo, nIn, nHashType,amount);
 
 	/* verify signature hash */
 	struct bp_key pubkey;
@@ -377,6 +377,13 @@ static bool bp_checksig(const struct buffer *vchSigIn,
 out:
 	bp_key_free(&pubkey);
 	return rc;
+}
+
+static bool bp_checksig(const struct buffer *vchSigIn,
+		const struct buffer *vchPubKey,
+		const cstring *scriptCode,
+		const struct bp_tx *txTo, unsigned int nIn){
+	return bp_checksig_with_value(vchSigIn,vchPubKey,scriptCode,txTo,nIn,0);
 }
 
 bool static IsCompressedOrUncompressedPubKey(const struct buffer *vchPubKey) {
@@ -629,9 +636,9 @@ bool CheckSequence(const unsigned int nSequence, const struct bp_tx *txTo, unsig
 	return true;
 }
 
-static bool bp_script_eval(parr *stack, const cstring *script,
+static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			   const struct bp_tx *txTo, unsigned int nIn,
-			   unsigned int flags, int nHashType)
+			   unsigned int flags, int nHashType, int64_t amount)
 {
 	struct const_buffer pc = { script->str, script->len };
 	struct const_buffer pend = { script->str + script->len, 0 };
@@ -1298,9 +1305,9 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 				goto out;
 			}
 
-			bool fSuccess = bp_checksig(vchSig, vchPubKey,
+			bool fSuccess = bp_checksig_with_value(vchSig, vchPubKey,
 						       scriptCode,
-						       txTo, nIn);
+						       txTo, nIn, amount);
 
 			cstr_free(scriptCode, true);
 
@@ -1372,8 +1379,8 @@ static bool bp_script_eval(parr *stack, const cstring *script,
 				}
 
 				// Check signature
-				bool fOk = bp_checksig(vchSig, vchPubKey,
-							  scriptCode, txTo, nIn);
+				bool fOk = bp_checksig_with_value(vchSig, vchPubKey,
+							  scriptCode, txTo, nIn, amount);
 
 				if (fOk) {
 					isig++;
@@ -1436,9 +1443,16 @@ out:
 	return rc;
 }
 
-bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
+static bool bp_script_eval(parr *stack, const cstring *script,
+		   const struct bp_tx *txTo, unsigned int nIn,
+		   unsigned int flags, int nHashType){
+	return bp_script_eval_with_value(stack,script,txTo,nIn,flags,nHashType,0);
+}
+
+
+bool bp_script_verify_with_value(const cstring *scriptSig, const cstring *scriptPubKey,
 		      const struct bp_tx *txTo, unsigned int nIn,
-		      unsigned int flags, int nHashType)
+		      unsigned int flags, int nHashType, int64_t amount)
 {
 	bool rc = false;
 	parr *stack = parr_new(0, buffer_freep);
@@ -1448,7 +1462,7 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 	if ((flags & SCRIPT_VERIFY_SIGPUSHONLY) != 0 && !is_bsp_pushonly(&sigbuf))
 		goto out;
 
-	if (!bp_script_eval(stack, scriptSig, txTo, nIn, flags, nHashType))
+	if (!bp_script_eval_with_value(stack, scriptSig, txTo, nIn, flags, nHashType, amount))
 		goto out;
 
 	if (flags & SCRIPT_VERIFY_P2SH) {
@@ -1456,7 +1470,7 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 		stack_copy(stackCopy, stack);
 	}
 
-	if (!bp_script_eval(stack, scriptPubKey, txTo, nIn, flags, nHashType))
+	if (!bp_script_eval_with_value(stack, scriptPubKey, txTo, nIn, flags, nHashType,amount))
 		goto out;
 	if (stack->len == 0)
 		goto out;
@@ -1481,8 +1495,8 @@ bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
 
 		buffer_freep(pubKeySerialized);
 
-		bool rc2 = bp_script_eval(stackCopy, pubkey2, txTo, nIn,
-					  flags, nHashType);
+		bool rc2 = bp_script_eval_with_value(stackCopy, pubkey2, txTo, nIn,
+					  flags, nHashType,amount);
 		cstr_free(pubkey2, true);
 
 		if (!rc2)
@@ -1511,6 +1525,13 @@ out:
 		parr_free(stackCopy, true);
 	return rc;
 }
+
+bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubKey,
+	      const struct bp_tx *txTo, unsigned int nIn,
+	      unsigned int flags, int nHashType){
+	return bp_script_verify_with_value(scriptSig,scriptPubKey,txTo,nIn,flags,nHashType,0);
+}
+
 
 bool bp_verify_sig(const struct bp_utxo *txFrom, const struct bp_tx *txTo,
 		   unsigned int nIn, unsigned int flags, int nHashType)
