@@ -294,7 +294,11 @@ extern bool bp_script_verify(const cstring *scriptSig, const cstring *scriptPubK
 		      const struct bp_tx *txTo, unsigned int nIn,
 		      unsigned int flags, int nHashType);
 extern bool bp_verify_sig(const struct bp_utxo *txFrom, const struct bp_tx *txTo,
-		   unsigned int nIn, unsigned int flags, int nHashType);
+		unsigned int nIn, unsigned int flags, int nHashType);
+
+extern bool bp_script_verify_with_value(const cstring *scriptSig, const cstring *scriptPubKey,
+	      const struct bp_tx *txTo, unsigned int nIn,
+	      unsigned int flags, int nHashType, int64_t amount);
 
 extern bool bp_script_sign(struct bp_keystore *ks, const cstring *fromPubKey,
 		    const struct bp_tx *txTo, unsigned int nIn,
