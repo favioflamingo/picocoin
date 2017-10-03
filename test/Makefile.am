@@ -17,12 +17,12 @@ libtest_a_SOURCES= libtest.h libtest.c chisq.c randtest.c
 noinst_PROGRAMS	= clist cstr coredefs hex hdkeys hashtab base58 fileio util \
 		  crypto keystore keyset bloom mbr misc net sighash \
 		  message parr prng script-parse tx block blockfile blkdb script \
-		  tx-valid tx-valid-uahf wallet wallet-basics chain-verf hash ctaes aes-util uahf-sighash uahf-script
+		  tx-valid  wallet wallet-basics chain-verf hash ctaes aes-util uahf-sighash uahf-script
 
 TESTS		= clist cstr coredefs hex hdkeys hashtab base58 fileio util \
 		  crypto keystore keyset bloom mbr misc net sighash \
 		  message parr prng script-parse tx block blockfile blkdb script \
-		  tx-valid tx-valid-uahf wallet wallet-basics chain-verf hash ctaes aes-util \
+		  tx-valid  wallet wallet-basics chain-verf hash ctaes aes-util \
 		  uahf-sighash uahf-script
 
 COMMON_LDADD	= libtest.a $(top_builddir)/lib/libccoin.la \
