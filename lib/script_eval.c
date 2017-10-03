@@ -1298,7 +1298,23 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 
 			// Drop the signature, since there's no way for
 			// a signature to sign itself
-			string_find_del(scriptCode, vchSig);
+			/*
+			 * gating code
+			 */
+			//uint32_t nHashType = GetHashType(vchSig);
+			if (nHashType & SIGHASH_FORKID_UAHF) {
+				if (!(flags & SCRIPT_ENABLE_SIGHASH_FORKID)){
+					cstr_free(scriptCode, true);
+					rc = false;
+					goto out;
+				}
+
+			} else {
+				// Drop the signature in scripts when SIGHASH_FORKID is not used.
+				//scriptCode.FindAndDelete(CScript(vchSig));
+				string_find_del(scriptCode, vchSig);
+			}
+
 
 			if (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey, flags)) {
 				cstr_free(scriptCode, true);
