@@ -508,7 +508,7 @@ bool static IsDefinedHashtypeSignature(const struct buffer *vchSig) {
 
 	const unsigned char *sig = vchSig->p;
 
-    unsigned char nHashType = sig[vchSig->len - 1] & (~(SIGHASH_ANYONECANPAY));
+    unsigned char nHashType = sig[vchSig->len - 1] & (~(SIGHASH_ANYONECANPAY | SIGHASH_FORKID_UAHF));
 
     if (nHashType < SIGHASH_ALL || nHashType > SIGHASH_SINGLE)
         return false;
