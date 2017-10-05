@@ -659,9 +659,11 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 	mpz_init(bn);
 	mpz_init_set_ui(bn_Zero, 0);
 	mpz_init_set_ui(bn_One,1);
-
+	fprintf(stderr,"bp_script_eval_with_value - 1\n");
 	if (script->len > MAX_SCRIPT_SIZE)
 		goto out;
+
+	fprintf(stderr,"bp_script_eval_with_value - 2\n");
 
 	unsigned int nOpCount = 0;
 	bool fRequireMinimal = (flags & SCRIPT_VERIFY_MINIMALDATA) != 0;
@@ -1310,8 +1312,11 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			 * gating code
 			 */
 			//uint32_t nHashType = GetHashType(vchSig);
+			fprintf(stderr,"bp_script_eval_with_value - 2\n");
 			if (nHashType & SIGHASH_FORKID_UAHF) {
+				fprintf(stderr,"bp_script_eval_with_value - 2.1\n");
 				if (!(flags & SCRIPT_ENABLE_SIGHASH_FORKID)){
+					fprintf(stderr,"bp_script_eval_with_value - 2.2\n");
 					cstr_free(scriptCode, true);
 					rc = false;
 					goto out;
@@ -1320,15 +1325,16 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			} else {
 				// Drop the signature in scripts when SIGHASH_FORKID is not used.
 				//scriptCode.FindAndDelete(CScript(vchSig));
+				fprintf(stderr,"bp_script_eval_with_value - 2.3\n");
 				string_find_del(scriptCode, vchSig);
 			}
 
-
+			fprintf(stderr,"bp_script_eval_with_value - 3\n");
 			if (!CheckSignatureEncoding(vchSig, flags) || !CheckPubKeyEncoding(vchPubKey, flags)) {
 				cstr_free(scriptCode, true);
 				goto out;
 			}
-
+			fprintf(stderr,"bp_script_eval_with_value - 4\n");
 			bool fSuccess = bp_checksig_with_value(vchSig, vchPubKey,
 						       scriptCode,
 						       txTo, nIn, amount);
@@ -1483,24 +1489,39 @@ bool bp_script_verify_with_value(const cstring *scriptSig, const cstring *script
 	parr *stackCopy = NULL;
 
 	struct const_buffer sigbuf = { scriptSig->str, scriptSig->len };
+
+	fprintf(stderr,"bp_script_verify_with_value - 1\n");
+
 	if ((flags & SCRIPT_VERIFY_SIGPUSHONLY) != 0 && !is_bsp_pushonly(&sigbuf))
 		goto out;
 
+	fprintf(stderr,"bp_script_verify_with_value - 2\n");
+
 	if (!bp_script_eval_with_value(stack, scriptSig, txTo, nIn, flags, nHashType, amount))
 		goto out;
+
+	fprintf(stderr,"bp_script_verify_with_value - 3\n");
 
 	if (flags & SCRIPT_VERIFY_P2SH) {
 		stackCopy = parr_new(stack->len, buffer_freep);
 		stack_copy(stackCopy, stack);
 	}
 
+
 	if (!bp_script_eval_with_value(stack, scriptPubKey, txTo, nIn, flags, nHashType,amount))
 		goto out;
+
+	fprintf(stderr,"bp_script_verify_with_value - 4\n");
+
 	if (stack->len == 0)
 		goto out;
 
+	fprintf(stderr,"bp_script_verify_with_value - 5\n");
+
 	if (CastToBool(stacktop(stack, -1)) == false)
 		goto out;
+
+	fprintf(stderr,"bp_script_verify_with_value - 6\n");
 
 	if ((flags & SCRIPT_VERIFY_P2SH) && is_bsp_p2sh_str(scriptPubKey)) {
 		// scriptSig must be literals-only or validation fails
@@ -1530,6 +1551,8 @@ bool bp_script_verify_with_value(const cstring *scriptSig, const cstring *script
 		if (CastToBool(stacktop(stackCopy, -1)) == false)
 			goto out;
 	}
+
+	fprintf(stderr,"bp_script_verify_with_value - 7\n");
 	// The CLEANSTACK check is only performed after potential P2SH evaluation,
 	// as the non-P2SH evaluation of a P2SH script will obviously not result in
 	// a clean stack (the P2SH inputs remain).
