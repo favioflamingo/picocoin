@@ -1,12 +1,4 @@
 0001-appending-ccoin_-to-operator-names.patch
 0002-updating-soname.patch
-0003-updating-soname.patch
-0004-fixing-operator-names-NOP.patch
-0005-removing-aes-util-temporarily-in-order-to-get-an-arm.patch
-0006-appending-ccoin_-to-operator-names.patch
-0007-updating-soname.patch
-0008-updating-soname.patch
-0009-fixing-operator-names-NOP.patch
-0010-removing-aes-util-temporarily-in-order-to-get-an-arm.patch
-0011-fixed-compile-issues-with-ccoin_-prefix.patch
-0012-adding-fixes-to-uahf-script-validations.patch
+0003-fixing-operator-names-NOP.patch
+0004-fixed-compile-issues-with-ccoin_-prefix.patch
