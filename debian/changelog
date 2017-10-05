@@ -1,3 +1,10 @@
+picocoin (0.6-1) jessie; urgency=medium
+
+  * added tests for sighash
+  * added script validation to uahf forks
+
+ -- Joel DeJesus (Work Email) <dejesus.joel@e-flamingo.jp>  Thu, 05 Oct 2017 17:49:58 +0900
+
 picocoin (0.5-4) jessie; urgency=medium
 
   [ libbitc ]

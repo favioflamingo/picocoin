@@ -3,8 +3,8 @@ Date: Tue, 18 Apr 2017 00:08:00 +0900
 Subject: fixing operator names, NOP
 
 ---
- lib/Makefile.am             | 2 +-
- test/data/script_tests.json | 4 ++--
+ lib/Makefile.am        | 2 +-
+ test/script_tests.json | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/lib/Makefile.am b/lib/Makefile.am
@@ -20,11 +20,11 @@ index d44d326..da2f826 100644
  
  noinst_LTLIBRARIES= libccoinnet.la libccoinaes.la
  
-diff --git a/test/data/script_tests.json b/test/data/script_tests.json
-index a5b308a..4321a82 100644
---- a/test/data/script_tests.json
-+++ b/test/data/script_tests.json
-@@ -233,7 +233,7 @@
+diff --git a/test/script_tests.json b/test/script_tests.json
+index 57bd6d5..376797d 100644
+--- a/test/script_tests.json
++++ b/test/script_tests.json
+@@ -226,7 +226,7 @@
  
  
  ["1","NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10 1 EQUAL", "P2SH,STRICTENC", "OK"],
@@ -33,7 +33,7 @@ index a5b308a..4321a82 100644
  
  ["1", "NOP", "P2SH,STRICTENC,DISCOURAGE_UPGRADABLE_NOPS", "OK", "Discourage NOPx flag allows ccoin_OP_NOP"],
  
-@@ -862,7 +862,7 @@
+@@ -844,7 +844,7 @@
  ["2 1 RSHIFT", "1 EQUAL", "P2SH,STRICTENC", "DISABLED_OPCODE", "disabled"],
  
  ["1", "NOP1 CHECKLOCKTIMEVERIFY CHECKSEQUENCEVERIFY NOP4 NOP5 NOP6 NOP7 NOP8 NOP9 NOP10 2 EQUAL", "P2SH,STRICTENC", "EVAL_FALSE"],
