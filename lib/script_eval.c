@@ -16,6 +16,13 @@
 
 static const size_t nDefaultMaxNumSize = 4;
 
+unsigned int GetHashType(const struct buffer *vchSigIn){
+	unsigned char *vch_back = vchSigIn->p + (vchSigIn->len - 1);
+	unsigned int nHashType = *vch_back;
+	return nHashType;
+}
+
+
 static void string_find_del(cstring *s, const struct buffer *buf)
 {
 	/* wrap buffer in a script */
@@ -519,8 +526,22 @@ static bool CheckSignatureEncoding(const struct buffer *vchSig, unsigned int fla
 		return false;
     else if ((flags & SCRIPT_VERIFY_LOW_S) != 0 && !IsLowDERSignature(vchSig))
 		return false;
-	else if ((flags & SCRIPT_VERIFY_STRICTENC) != 0 && !IsDefinedHashtypeSignature(vchSig))
-        return false;
+
+    else if((flags & SCRIPT_VERIFY_STRICTENC) != 0){
+    	if(!IsDefinedHashtypeSignature(vchSig)){
+    		return false;
+    	}
+
+    	bool usesForkId = GetHashType(vchSig) & SIGHASH_FORKID_UAHF;
+    	bool forkIdEnabled = flags & SCRIPT_ENABLE_SIGHASH_FORKID;
+    	if (!forkIdEnabled && usesForkId) {
+    		return false;
+    	}
+    	if (forkIdEnabled && !usesForkId) {
+    		return false;
+    	}
+
+    }
 
     return true;
 }
@@ -643,6 +664,8 @@ bool CheckSequence(const unsigned int nSequence, const struct bp_tx *txTo, unsig
 
 	return true;
 }
+
+
 
 static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			   const struct bp_tx *txTo, unsigned int nIn,
