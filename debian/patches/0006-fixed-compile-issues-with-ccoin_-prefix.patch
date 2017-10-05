@@ -28,7 +28,7 @@ index da2f826..59c2ce0 100644
  noinst_LTLIBRARIES= libccoinnet.la libccoinaes.la
  
 diff --git a/lib/script_eval.c b/lib/script_eval.c
-index 32ed8b2..d0f57b7 100644
+index 80bd737..3e8d9c9 100644
 --- a/lib/script_eval.c
 +++ b/lib/script_eval.c
 @@ -84,7 +84,7 @@ void bp_tx_sigserializer(cstring *s, const cstring *scriptCode,
@@ -49,7 +49,7 @@ index 32ed8b2..d0f57b7 100644
  					ser_bytes(s, itBegin.p, it.p - itBegin.p - 1);
  					itBegin  = it;
  			    }
-@@ -683,7 +683,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -685,7 +685,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  		if (disabled_op[opcode])
  			goto out;
  
@@ -58,7 +58,7 @@ index 32ed8b2..d0f57b7 100644
  			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
  				goto out;
  			stack_push(stack, (struct buffer *) &op.data);
-@@ -1647,7 +1647,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
+@@ -1670,7 +1670,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
  	bsp_start(&bp, &it);
  
  	while (bsp_getop(&op, &bp)) {
@@ -67,7 +67,7 @@ index 32ed8b2..d0f57b7 100644
  		    nCodeSeparators++;
  	}
  	cstring *x = cstr_new_sz(1024*8);
-@@ -1656,7 +1656,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
+@@ -1679,7 +1679,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
  	bsp_start(&bp, &it);
  
  	while (bsp_getop(&op, &bp)) {
