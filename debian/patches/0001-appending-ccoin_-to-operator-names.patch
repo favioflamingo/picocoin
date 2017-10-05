@@ -509,10 +509,10 @@ index 555ae62..69a67dc 100644
  	return script_out;
  }
 diff --git a/lib/script_eval.c b/lib/script_eval.c
-index 1347629..a891038 100644
+index a5935b0..a1bb8dc 100644
 --- a/lib/script_eval.c
 +++ b/lib/script_eval.c
-@@ -206,21 +206,21 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
+@@ -205,21 +205,21 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
  }
  
  static const unsigned char disabled_op[256] = {
@@ -549,7 +549,7 @@ index 1347629..a891038 100644
  };
  
  static bool CastToBigNum(mpz_t vo, const struct buffer *buf, bool fRequireMinimal, const size_t nMaxNumSize)
-@@ -566,23 +566,23 @@ bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode)
+@@ -554,23 +554,23 @@ bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode)
  	const unsigned char *vch = data->p;
  
  	if (data->len == 0) {
@@ -583,7 +583,7 @@ index 1347629..a891038 100644
  	}
      return true;
  }
-@@ -711,7 +711,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -697,7 +697,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  
  		if (op.data.len > MAX_SCRIPT_ELEMENT_SIZE)
  			goto out;
@@ -592,7 +592,7 @@ index 1347629..a891038 100644
  			goto out;
  		if (disabled_op[opcode])
  			goto out;
-@@ -720,40 +720,40 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -706,40 +706,40 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
  				goto out;
  			stack_push(stack, (struct buffer *) &op.data);
@@ -654,7 +654,7 @@ index 1347629..a891038 100644
  			if (!(flags & SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY)) {
  				// not enabled; treat as a NOP2
  				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
-@@ -797,7 +797,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -783,7 +783,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -663,7 +663,7 @@ index 1347629..a891038 100644
  		{
  			if (!(flags & SCRIPT_VERIFY_CHECKSEQUENCEVERIFY)) {
  				// not enabled; treat as a NOP3
-@@ -836,14 +836,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -822,14 +822,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -682,7 +682,7 @@ index 1347629..a891038 100644
  			// <expression> if [statements] [else [statements]] endif
  			bool fValue = false;
  			if (fExec) {
-@@ -851,7 +851,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -837,7 +837,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  					goto out;
  				struct buffer *vch = stacktop(stack, -1);
  				fValue = CastToBool(vch);
@@ -691,7 +691,7 @@ index 1347629..a891038 100644
  					fValue = !fValue;
  				popstack(stack);
  			}
-@@ -860,7 +860,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -846,7 +846,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -700,7 +700,7 @@ index 1347629..a891038 100644
  			if (vfExec->len == 0)
  				goto out;
  			uint8_t *v = (uint8_t *) &vfExec->str[vfExec->len - 1];
-@@ -868,13 +868,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -854,13 +854,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -716,7 +716,7 @@ index 1347629..a891038 100644
  			if (stack->len < 1)
  				goto out;
  			bool fValue = CastToBool(stacktop(stack, -1));
-@@ -885,27 +885,27 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -871,27 +871,27 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -748,7 +748,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- )
  			if (stack->len < 2)
  				goto out;
-@@ -913,7 +913,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -899,7 +899,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			popstack(stack);
  			break;
  
@@ -757,7 +757,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- x1 x2 x1 x2)
  			if (stack->len < 2)
  				goto out;
-@@ -924,7 +924,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -910,7 +910,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -766,7 +766,7 @@ index 1347629..a891038 100644
  			// (x1 x2 x3 -- x1 x2 x3 x1 x2 x3)
  			if (stack->len < 3)
  				goto out;
-@@ -937,7 +937,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -923,7 +923,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -775,7 +775,7 @@ index 1347629..a891038 100644
  			// (x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2)
  			if (stack->len < 4)
  				goto out;
-@@ -948,7 +948,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -934,7 +934,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -784,7 +784,7 @@ index 1347629..a891038 100644
  			// (x1 x2 x3 x4 x5 x6 -- x3 x4 x5 x6 x1 x2)
  			if (stack->len < 6)
  				goto out;
-@@ -960,7 +960,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -946,7 +946,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -793,7 +793,7 @@ index 1347629..a891038 100644
  			// (x1 x2 x3 x4 -- x3 x4 x1 x2)
  			if (stack->len < 4)
  				goto out;
-@@ -968,7 +968,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -954,7 +954,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			stack_swap(stack, -3, -1);
  			break;
  
@@ -802,7 +802,7 @@ index 1347629..a891038 100644
  			// (x - 0 | x x)
  			if (stack->len < 1)
  				goto out;
-@@ -978,20 +978,20 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -964,20 +964,20 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -826,7 +826,7 @@ index 1347629..a891038 100644
  			// (x -- x x)
  			if (stack->len < 1)
  				goto out;
-@@ -1000,14 +1000,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -986,14 +986,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -843,7 +843,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- x1 x2 x1)
  			if (stack->len < 2)
  				goto out;
-@@ -1016,8 +1016,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1002,8 +1002,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -854,7 +854,7 @@ index 1347629..a891038 100644
  			// (xn ... x2 x1 x0 n - xn ... x2 x1 x0 xn)
  			// (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
  			if (stack->len < 2)
-@@ -1028,7 +1028,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1014,7 +1014,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			if (n < 0 || n >= (int)stack->len)
  				goto out;
  			struct buffer *vch = stacktop(stack, -n-1);
@@ -863,7 +863,7 @@ index 1347629..a891038 100644
  				vch = buffer_copy(vch->p, vch->len);
  				parr_remove_idx(stack,
  							 stack->len - n - 1);
-@@ -1038,7 +1038,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1024,7 +1024,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -872,7 +872,7 @@ index 1347629..a891038 100644
  			// (x1 x2 x3 -- x2 x3 x1)
  			//  x2 x1 x3  after first swap
  			//  x2 x3 x1  after second swap
-@@ -1049,7 +1049,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1035,7 +1035,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -881,7 +881,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- x2 x1)
  			if (stack->len < 2)
  				goto out;
-@@ -1057,7 +1057,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1043,7 +1043,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -890,7 +890,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- x2 x1 x2)
  			if (stack->len < 2)
  				goto out;
-@@ -1066,7 +1066,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1052,7 +1052,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -899,7 +899,7 @@ index 1347629..a891038 100644
  			// (in -- in size)
  			if (stack->len < 1)
  				goto out;
-@@ -1077,23 +1077,24 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1063,23 +1063,24 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  		}
  
  
@@ -929,7 +929,7 @@ index 1347629..a891038 100644
  				if (fEqual)
  					popstack(stack);
  				else
-@@ -1105,12 +1106,12 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1091,12 +1092,12 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  		//
  		// Numeric
  		//
@@ -948,7 +948,7 @@ index 1347629..a891038 100644
  			// (in -- out)
  			if (stack->len < 1)
  				goto out;
-@@ -1118,22 +1119,22 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1104,22 +1105,22 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  				goto out;
  			switch (opcode)
  			{
@@ -977,7 +977,7 @@ index 1347629..a891038 100644
  				mpz_set_ui(bn, mpz_sgn(bn) == 0 ? 0 : 1);
  				break;
  			default:
-@@ -1145,19 +1146,19 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1131,19 +1132,19 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -1010,7 +1010,7 @@ index 1347629..a891038 100644
  			// (x1 x2 -- out)
  			if (stack->len < 2)
  				goto out;
-@@ -1174,54 +1175,54 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1160,54 +1161,54 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  
  			switch (opcode)
  			{
@@ -1078,7 +1078,7 @@ index 1347629..a891038 100644
  				if (mpz_cmp(bn1, bn2) > 0)
  					mpz_set(bn, bn1);
  				else
-@@ -1237,7 +1238,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1223,7 +1224,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			mpz_clear(bn1);
  			mpz_clear(bn2);
  
@@ -1087,7 +1087,7 @@ index 1347629..a891038 100644
  			{
  				if (CastToBool(stacktop(stack, -1)))
  					popstack(stack);
-@@ -1247,7 +1248,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1233,7 +1234,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -1096,7 +1096,7 @@ index 1347629..a891038 100644
  			// (x min max -- out)
  			if (stack->len < 3)
  				goto out;
-@@ -1275,11 +1276,11 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1261,11 +1262,11 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  		//
  		// Crypto
  		//
@@ -1113,7 +1113,7 @@ index 1347629..a891038 100644
  			// (in -- hash)
  			if (stack->len < 1)
  				goto out;
-@@ -1288,23 +1289,23 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1274,23 +1275,23 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			unsigned char md[32];
  
  			switch (opcode) {
@@ -1142,7 +1142,7 @@ index 1347629..a891038 100644
  				hashlen = 32;
  				bu_Hash(md, vch->p, vch->len);
  				break;
-@@ -1319,13 +1320,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1305,13 +1306,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -1159,7 +1159,7 @@ index 1347629..a891038 100644
  			// (sig pubkey -- bool)
  			if (stack->len < 2)
  				goto out;
-@@ -1374,8 +1375,9 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1353,8 +1354,9 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  
  			popstack(stack);
  			popstack(stack);
@@ -1170,7 +1170,7 @@ index 1347629..a891038 100644
  			{
  				if (fSuccess)
  					popstack(stack);
-@@ -1385,8 +1387,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1364,8 +1366,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  			break;
  		}
  
@@ -1181,7 +1181,7 @@ index 1347629..a891038 100644
  			// ([sig ...] num_of_signatures [pubkey ...] num_of_pubkeys -- bool)
  
  			int i = 1;
-@@ -1476,7 +1478,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1455,7 +1457,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  
  			stack_push_str(stack, fSuccess ? bn_getvch(bn_One) : bn_getvch(bn_Zero));
  
