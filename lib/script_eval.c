@@ -91,7 +91,7 @@ void bp_tx_sigserializer(cstring *s, const cstring *scriptCode,
 			bsp_start(&bp, &it);
 
 			while (bsp_getop(&op, &bp)) {
-				if (op.op == OP_CODESEPARATOR)
+				if (op.op == ccoin_OP_CODESEPARATOR)
 				    nCodeSeparators++;
 			}
 			ser_varlen(s, scriptCode->len - nCodeSeparators);
@@ -100,7 +100,7 @@ void bp_tx_sigserializer(cstring *s, const cstring *scriptCode,
 			bsp_start(&bp, &it);
 
 			while (bsp_getop(&op, &bp)) {
-			    if (op.op == OP_CODESEPARATOR) {
+			    if (op.op == ccoin_OP_CODESEPARATOR) {
 					ser_bytes(s, itBegin.p, it.p - itBegin.p - 1);
 					itBegin  = it;
 			    }
@@ -205,21 +205,21 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
 }
 
 static const unsigned char disabled_op[256] = {
-	[OP_CAT] = 1,
-	[OP_SUBSTR] = 1,
-	[OP_LEFT] = 1,
-	[OP_RIGHT] = 1,
-	[OP_INVERT] = 1,
-	[OP_AND] = 1,
-	[OP_OR] = 1,
-	[OP_XOR] = 1,
-	[OP_2MUL] = 1,
-	[OP_2DIV] = 1,
-	[OP_MUL] = 1,
-	[OP_DIV] = 1,
-	[OP_MOD] = 1,
-	[OP_LSHIFT] = 1,
-	[OP_RSHIFT] = 1,
+	[ccoin_OP_CAT] = 1,
+	[ccoin_OP_SUBSTR] = 1,
+	[ccoin_OP_LEFT] = 1,
+	[ccoin_OP_RIGHT] = 1,
+	[ccoin_OP_INVERT] = 1,
+	[ccoin_OP_AND] = 1,
+	[ccoin_OP_OR] = 1,
+	[ccoin_OP_XOR] = 1,
+	[ccoin_OP_2MUL] = 1,
+	[ccoin_OP_2DIV] = 1,
+	[ccoin_OP_MUL] = 1,
+	[ccoin_OP_DIV] = 1,
+	[ccoin_OP_MOD] = 1,
+	[ccoin_OP_LSHIFT] = 1,
+	[ccoin_OP_RSHIFT] = 1,
 };
 
 static bool CastToBigNum(mpz_t vo, const struct buffer *buf, bool fRequireMinimal, const size_t nMaxNumSize)
@@ -554,23 +554,23 @@ bool static CheckMinimalPush(struct const_buffer *data, enum opcodetype opcode) 
 	const unsigned char *vch = data->p;
 
 	if (data->len == 0) {
-		// Could have used OP_0.
-		return opcode == OP_0;
+		// Could have used ccoin_OP_0.
+		return opcode == ccoin_OP_0;
 	} else if (data->len == 1 && vch[0] >= 1 && vch[0] <= 16) {
-		// Could have used OP_1 .. OP_16.
-		return opcode == OP_1 + (vch[0] - 1);
+		// Could have used ccoin_OP_1 .. ccoin_OP_16.
+		return opcode == ccoin_OP_1 + (vch[0] - 1);
 	} else if (data->len == 1 && vch[0] == 0x81) {
-		// Could have used OP_1NEGATE.
-		return opcode == OP_1NEGATE;
+		// Could have used ccoin_OP_1NEGATE.
+		return opcode == ccoin_OP_1NEGATE;
 	} else if (data->len <= 75) {
 		// Could have used a direct push (opcode indicating number of bytes pushed + those bytes).
 		return opcode == data->len;
 	} else if (data->len <= 255) {
-		// Could have used OP_PUSHDATA.
-		return opcode == OP_PUSHDATA1;
+		// Could have used ccoin_OP_PUSHDATA.
+		return opcode == ccoin_OP_PUSHDATA1;
 	} else if (data->len <= 65535) {
-		// Could have used OP_PUSHDATA2.
-		return opcode == OP_PUSHDATA2;
+		// Could have used ccoin_OP_PUSHDATA2.
+		return opcode == ccoin_OP_PUSHDATA2;
 	}
     return true;
 }
@@ -697,49 +697,49 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 
 		if (op.data.len > MAX_SCRIPT_ELEMENT_SIZE)
 			goto out;
-		if (opcode > OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
+		if (opcode > ccoin_OP_16 && ++nOpCount > MAX_OPS_PER_SCRIPT)
 			goto out;
 		if (disabled_op[opcode])
 			goto out;
 
-		if (fExec && 0 <= opcode && opcode <= OP_PUSHDATA4) {
+		if (fExec && 0 <= opcode && opcode <= ccoin_OP_PUSHDATA4) {
 			if (fRequireMinimal && !CheckMinimalPush(&op.data, opcode))
 				goto out;
 			stack_push(stack, (struct buffer *) &op.data);
-		} else if (fExec || (OP_IF <= opcode && opcode <= OP_ENDIF))
+		} else if (fExec || (ccoin_OP_IF <= opcode && opcode <= ccoin_OP_ENDIF))
 		switch (opcode) {
 
 		//
 		// Push value
 		//
-		case OP_1NEGATE:
-		case OP_1:
-		case OP_2:
-		case OP_3:
-		case OP_4:
-		case OP_5:
-		case OP_6:
-		case OP_7:
-		case OP_8:
-		case OP_9:
-		case OP_10:
-		case OP_11:
-		case OP_12:
-		case OP_13:
-		case OP_14:
-		case OP_15:
-		case OP_16:
-			mpz_set_si(bn, (int)opcode - (int)(OP_1 - 1));
+		case ccoin_OP_1NEGATE:
+		case ccoin_OP_1:
+		case ccoin_OP_2:
+		case ccoin_OP_3:
+		case ccoin_OP_4:
+		case ccoin_OP_5:
+		case ccoin_OP_6:
+		case ccoin_OP_7:
+		case ccoin_OP_8:
+		case ccoin_OP_9:
+		case ccoin_OP_10:
+		case ccoin_OP_11:
+		case ccoin_OP_12:
+		case ccoin_OP_13:
+		case ccoin_OP_14:
+		case ccoin_OP_15:
+		case ccoin_OP_16:
+			mpz_set_si(bn, (int)opcode - (int)(ccoin_OP_1 - 1));
 			stack_push_str(stack, bn_getvch(bn));
 			break;
 
 		//
 		// Control
 		//
-		case OP_NOP:
+		case ccoin_OP_NOP:
 			break;
 
-		case OP_CHECKLOCKTIMEVERIFY: {
+		case ccoin_OP_CHECKLOCKTIMEVERIFY: {
 			if (!(flags & SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY)) {
 				// not enabled; treat as a NOP2
 				if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
@@ -783,7 +783,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_CHECKSEQUENCEVERIFY:
+		case ccoin_OP_CHECKSEQUENCEVERIFY:
 		{
 			if (!(flags & SCRIPT_VERIFY_CHECKSEQUENCEVERIFY)) {
 				// not enabled; treat as a NOP3
@@ -822,14 +822,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_NOP1: case OP_NOP4: case OP_NOP5:
-		case OP_NOP6: case OP_NOP7: case OP_NOP8: case OP_NOP9: case OP_NOP10:
+		case ccoin_OP_NOP1: case ccoin_OP_NOP4: case ccoin_OP_NOP5:
+		case ccoin_OP_NOP6: case ccoin_OP_NOP7: case ccoin_OP_NOP8: case ccoin_OP_NOP9: case ccoin_OP_NOP10:
 			if (flags & SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS)
 				goto out;
 			break;
 
-		case OP_IF:
-		case OP_NOTIF: {
+		case ccoin_OP_IF:
+		case ccoin_OP_NOTIF: {
 			// <expression> if [statements] [else [statements]] endif
 			bool fValue = false;
 			if (fExec) {
@@ -837,7 +837,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 					goto out;
 				struct buffer *vch = stacktop(stack, -1);
 				fValue = CastToBool(vch);
-				if (opcode == OP_NOTIF)
+				if (opcode == ccoin_OP_NOTIF)
 					fValue = !fValue;
 				popstack(stack);
 			}
@@ -846,7 +846,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_ELSE: {
+		case ccoin_OP_ELSE: {
 			if (vfExec->len == 0)
 				goto out;
 			uint8_t *v = (uint8_t *) &vfExec->str[vfExec->len - 1];
@@ -854,13 +854,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_ENDIF:
+		case ccoin_OP_ENDIF:
 			if (vfExec->len == 0)
 				goto out;
 			cstr_erase(vfExec, vfExec->len - 1, 1);
 			break;
 
-		case OP_VERIFY: {
+		case ccoin_OP_VERIFY: {
 			if (stack->len < 1)
 				goto out;
 			bool fValue = CastToBool(stacktop(stack, -1));
@@ -871,27 +871,27 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_RETURN:
+		case ccoin_OP_RETURN:
 			goto out;
 
 		//
 		// Stack ops
 		//
-		case OP_TOALTSTACK:
+		case ccoin_OP_TOALTSTACK:
 			if (stack->len < 1)
 				goto out;
 			stack_push(altstack, stacktop(stack, -1));
 			popstack(stack);
 			break;
 
-		case OP_FROMALTSTACK:
+		case ccoin_OP_FROMALTSTACK:
 			if (altstack->len < 1)
 				goto out;
 			stack_push(stack, stacktop(altstack, -1));
 			popstack(altstack);
 			break;
 
-		case OP_2DROP:
+		case ccoin_OP_2DROP:
 			// (x1 x2 -- )
 			if (stack->len < 2)
 				goto out;
@@ -899,7 +899,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			popstack(stack);
 			break;
 
-		case OP_2DUP: {
+		case ccoin_OP_2DUP: {
 			// (x1 x2 -- x1 x2 x1 x2)
 			if (stack->len < 2)
 				goto out;
@@ -910,7 +910,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_3DUP: {
+		case ccoin_OP_3DUP: {
 			// (x1 x2 x3 -- x1 x2 x3 x1 x2 x3)
 			if (stack->len < 3)
 				goto out;
@@ -923,7 +923,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_2OVER: {
+		case ccoin_OP_2OVER: {
 			// (x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2)
 			if (stack->len < 4)
 				goto out;
@@ -934,7 +934,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_2ROT: {
+		case ccoin_OP_2ROT: {
 			// (x1 x2 x3 x4 x5 x6 -- x3 x4 x5 x6 x1 x2)
 			if (stack->len < 6)
 				goto out;
@@ -946,7 +946,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_2SWAP:
+		case ccoin_OP_2SWAP:
 			// (x1 x2 x3 x4 -- x3 x4 x1 x2)
 			if (stack->len < 4)
 				goto out;
@@ -954,7 +954,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			stack_swap(stack, -3, -1);
 			break;
 
-		case OP_IFDUP: {
+		case ccoin_OP_IFDUP: {
 			// (x - 0 | x x)
 			if (stack->len < 1)
 				goto out;
@@ -964,20 +964,20 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_DEPTH:
+		case ccoin_OP_DEPTH:
 			// -- stacksize
 			mpz_set_ui(bn, stack->len);
 			stack_push_str(stack, bn_getvch(bn));
 			break;
 
-		case OP_DROP:
+		case ccoin_OP_DROP:
 			// (x -- )
 			if (stack->len < 1)
 				goto out;
 			popstack(stack);
 			break;
 
-		case OP_DUP: {
+		case ccoin_OP_DUP: {
 			// (x -- x x)
 			if (stack->len < 1)
 				goto out;
@@ -986,14 +986,14 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_NIP:
+		case ccoin_OP_NIP:
 			// (x1 x2 -- x2)
 			if (stack->len < 2)
 				goto out;
 			parr_remove_idx(stack, stack->len - 2);
 			break;
 
-		case OP_OVER: {
+		case ccoin_OP_OVER: {
 			// (x1 x2 -- x1 x2 x1)
 			if (stack->len < 2)
 				goto out;
@@ -1002,8 +1002,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_PICK:
-		case OP_ROLL: {
+		case ccoin_OP_PICK:
+		case ccoin_OP_ROLL: {
 			// (xn ... x2 x1 x0 n - xn ... x2 x1 x0 xn)
 			// (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
 			if (stack->len < 2)
@@ -1014,7 +1014,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			if (n < 0 || n >= (int)stack->len)
 				goto out;
 			struct buffer *vch = stacktop(stack, -n-1);
-			if (opcode == OP_ROLL) {
+			if (opcode == ccoin_OP_ROLL) {
 				vch = buffer_copy(vch->p, vch->len);
 				parr_remove_idx(stack,
 							 stack->len - n - 1);
@@ -1024,7 +1024,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_ROT: {
+		case ccoin_OP_ROT: {
 			// (x1 x2 x3 -- x2 x3 x1)
 			//  x2 x1 x3  after first swap
 			//  x2 x3 x1  after second swap
@@ -1035,7 +1035,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_SWAP: {
+		case ccoin_OP_SWAP: {
 			// (x1 x2 -- x2 x1)
 			if (stack->len < 2)
 				goto out;
@@ -1043,7 +1043,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_TUCK: {
+		case ccoin_OP_TUCK: {
 			// (x1 x2 -- x2 x1 x2)
 			if (stack->len < 2)
 				goto out;
@@ -1052,7 +1052,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_SIZE: {
+		case ccoin_OP_SIZE: {
 			// (in -- in size)
 			if (stack->len < 1)
 				goto out;
@@ -1063,23 +1063,24 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 		}
 
 
-		case OP_EQUAL:
-		case OP_EQUALVERIFY: {
+		case ccoin_OP_EQUAL:
+		case ccoin_OP_EQUALVERIFY: {
 			// (x1 x2 - bool)
 			if (stack->len < 2)
 				goto out;
 			struct buffer *vch1 = stacktop(stack, -2);
 			struct buffer *vch2 = stacktop(stack, -1);
 			bool fEqual = buffer_equal(vch1, vch2);
-			// OP_NOTEQUAL is disabled because it would be too easy to say
+			// ccoin_OP_NOTEQUAL is disabled because it would be too easy to say
 			// something like n != 1 and have some wiseguy pass in 1 with extra
 			// zero bytes after it (numerically, 0x01 == 0x0001 == 0x000001)
-			//if (opcode == OP_NOTEQUAL)
+			//if (opcode == ccoin_OP_NOTEQUAL)
 			//	fEqual = !fEqual;
 			popstack(stack);
 			popstack(stack);
+
 			stack_push_str(stack, fEqual ? bn_getvch(bn_One) : bn_getvch(bn_Zero));
-			if (opcode == OP_EQUALVERIFY) {
+			if (opcode == ccoin_OP_EQUALVERIFY) {
 				if (fEqual)
 					popstack(stack);
 				else
@@ -1091,12 +1092,12 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 		//
 		// Numeric
 		//
-		case OP_1ADD:
-		case OP_1SUB:
-		case OP_NEGATE:
-		case OP_ABS:
-		case OP_NOT:
-		case OP_0NOTEQUAL: {
+		case ccoin_OP_1ADD:
+		case ccoin_OP_1SUB:
+		case ccoin_OP_NEGATE:
+		case ccoin_OP_ABS:
+		case ccoin_OP_NOT:
+		case ccoin_OP_0NOTEQUAL: {
 			// (in -- out)
 			if (stack->len < 1)
 				goto out;
@@ -1104,22 +1105,22 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 				goto out;
 			switch (opcode)
 			{
-			case OP_1ADD:
+			case ccoin_OP_1ADD:
 				mpz_add_ui(bn, bn, 1);
 				break;
-			case OP_1SUB:
+			case ccoin_OP_1SUB:
 				mpz_sub_ui(bn, bn, 1);
 				break;
-			case OP_NEGATE:
+			case ccoin_OP_NEGATE:
 				mpz_neg(bn, bn);
 				break;
-			case OP_ABS:
+			case ccoin_OP_ABS:
 				mpz_abs(bn, bn);
 				break;
-			case OP_NOT:
+			case ccoin_OP_NOT:
 				mpz_set_ui(bn, mpz_sgn(bn) == 0 ? 1 : 0);
 				break;
-			case OP_0NOTEQUAL:
+			case ccoin_OP_0NOTEQUAL:
 				mpz_set_ui(bn, mpz_sgn(bn) == 0 ? 0 : 1);
 				break;
 			default:
@@ -1131,19 +1132,19 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_ADD:
-		case OP_SUB:
-		case OP_BOOLAND:
-		case OP_BOOLOR:
-		case OP_NUMEQUAL:
-		case OP_NUMEQUALVERIFY:
-		case OP_NUMNOTEQUAL:
-		case OP_LESSTHAN:
-		case OP_GREATERTHAN:
-		case OP_LESSTHANOREQUAL:
-		case OP_GREATERTHANOREQUAL:
-		case OP_MIN:
-		case OP_MAX: {
+		case ccoin_OP_ADD:
+		case ccoin_OP_SUB:
+		case ccoin_OP_BOOLAND:
+		case ccoin_OP_BOOLOR:
+		case ccoin_OP_NUMEQUAL:
+		case ccoin_OP_NUMEQUALVERIFY:
+		case ccoin_OP_NUMNOTEQUAL:
+		case ccoin_OP_LESSTHAN:
+		case ccoin_OP_GREATERTHAN:
+		case ccoin_OP_LESSTHANOREQUAL:
+		case ccoin_OP_GREATERTHANOREQUAL:
+		case ccoin_OP_MIN:
+		case ccoin_OP_MAX: {
 			// (x1 x2 -- out)
 			if (stack->len < 2)
 				goto out;
@@ -1160,54 +1161,54 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 
 			switch (opcode)
 			{
-			case OP_ADD:
+			case ccoin_OP_ADD:
 				mpz_add(bn, bn1, bn2);
 				break;
-			case OP_SUB:
+			case ccoin_OP_SUB:
 				mpz_sub(bn, bn1, bn2);
 				break;
-			case OP_BOOLAND:
+			case ccoin_OP_BOOLAND:
 				mpz_set_ui(bn,
 				    !(mpz_sgn(bn1) == 0) && !(mpz_sgn(bn2) == 0) ?
 				    1 : 0);
 				break;
-			case OP_BOOLOR:
+			case ccoin_OP_BOOLOR:
 				mpz_set_ui(bn,
 				    !(mpz_sgn(bn1) == 0) || !(mpz_sgn(bn2) == 0) ?
 				    1 : 0);
 				break;
-			case OP_NUMEQUAL:
-			case OP_NUMEQUALVERIFY:
+			case ccoin_OP_NUMEQUAL:
+			case ccoin_OP_NUMEQUALVERIFY:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) == 0 ?  1 : 0);
 				break;
-			case OP_NUMNOTEQUAL:
+			case ccoin_OP_NUMNOTEQUAL:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) != 0 ?  1 : 0);
 				break;
-			case OP_LESSTHAN:
+			case ccoin_OP_LESSTHAN:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) < 0 ?  1 : 0);
 				break;
-			case OP_GREATERTHAN:
+			case ccoin_OP_GREATERTHAN:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) > 0 ?  1 : 0);
 				break;
-			case OP_LESSTHANOREQUAL:
+			case ccoin_OP_LESSTHANOREQUAL:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) <= 0 ?  1 : 0);
 				break;
-			case OP_GREATERTHANOREQUAL:
+			case ccoin_OP_GREATERTHANOREQUAL:
 				mpz_set_ui(bn,
 				    mpz_cmp(bn1, bn2) >= 0 ?  1 : 0);
 				break;
-			case OP_MIN:
+			case ccoin_OP_MIN:
 				if (mpz_cmp(bn1, bn2) < 0)
 					mpz_set(bn, bn1);
 				else
 					mpz_set(bn, bn2);
 				break;
-			case OP_MAX:
+			case ccoin_OP_MAX:
 				if (mpz_cmp(bn1, bn2) > 0)
 					mpz_set(bn, bn1);
 				else
@@ -1223,7 +1224,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			mpz_clear(bn1);
 			mpz_clear(bn2);
 
-			if (opcode == OP_NUMEQUALVERIFY)
+			if (opcode == ccoin_OP_NUMEQUALVERIFY)
 			{
 				if (CastToBool(stacktop(stack, -1)))
 					popstack(stack);
@@ -1233,7 +1234,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_WITHIN: {
+		case ccoin_OP_WITHIN: {
 			// (x min max -- out)
 			if (stack->len < 3)
 				goto out;
@@ -1261,11 +1262,11 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 		//
 		// Crypto
 		//
-		case OP_RIPEMD160:
-		case OP_SHA1:
-		case OP_SHA256:
-		case OP_HASH160:
-		case OP_HASH256: {
+		case ccoin_OP_RIPEMD160:
+		case ccoin_OP_SHA1:
+		case ccoin_OP_SHA256:
+		case ccoin_OP_HASH160:
+		case ccoin_OP_HASH256: {
 			// (in -- hash)
 			if (stack->len < 1)
 				goto out;
@@ -1274,23 +1275,23 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			unsigned char md[32];
 
 			switch (opcode) {
-			case OP_RIPEMD160:
+			case ccoin_OP_RIPEMD160:
 				hashlen = 20;
 				ripemd160(vch->p, vch->len, md);
 				break;
-			case OP_SHA1:
+			case ccoin_OP_SHA1:
 				hashlen = 20;
 				sha1_Raw(vch->p, vch->len, md);
 				break;
-			case OP_SHA256:
+			case ccoin_OP_SHA256:
 				hashlen = 32;
 				sha256_Raw(vch->p, vch->len, md);
 				break;
-			case OP_HASH160:
+			case ccoin_OP_HASH160:
 				hashlen = 20;
 				bu_Hash160(md, vch->p, vch->len);
 				break;
-			case OP_HASH256:
+			case ccoin_OP_HASH256:
 				hashlen = 32;
 				bu_Hash(md, vch->p, vch->len);
 				break;
@@ -1305,13 +1306,13 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_CODESEPARATOR:
+		case ccoin_OP_CODESEPARATOR:
 			// Hash starts after the code separator
 			memcpy(&pbegincodehash, &pc, sizeof(pc));
 			break;
 
-		case OP_CHECKSIG:
-		case OP_CHECKSIGVERIFY: {
+		case ccoin_OP_CHECKSIG:
+		case ccoin_OP_CHECKSIGVERIFY: {
 			// (sig pubkey -- bool)
 			if (stack->len < 2)
 				goto out;
@@ -1353,8 +1354,9 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 
 			popstack(stack);
 			popstack(stack);
+
 			stack_push_str(stack, fSuccess ? bn_getvch(bn_One) : bn_getvch(bn_Zero));
-			if (opcode == OP_CHECKSIGVERIFY)
+			if (opcode == ccoin_OP_CHECKSIGVERIFY)
 			{
 				if (fSuccess)
 					popstack(stack);
@@ -1364,8 +1366,8 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			break;
 		}
 
-		case OP_CHECKMULTISIG:
-		case OP_CHECKMULTISIGVERIFY: {
+		case ccoin_OP_CHECKMULTISIG:
+		case ccoin_OP_CHECKMULTISIGVERIFY: {
 			// ([sig ...] num_of_signatures [pubkey ...] num_of_pubkeys -- bool)
 
 			int i = 1;
@@ -1455,7 +1457,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 
 			stack_push_str(stack, fSuccess ? bn_getvch(bn_One) : bn_getvch(bn_Zero));
 
-			if (opcode == OP_CHECKMULTISIGVERIFY)
+			if (opcode == ccoin_OP_CHECKMULTISIGVERIFY)
 			{
 				if (fSuccess)
 					popstack(stack);
@@ -1666,7 +1668,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
 	bsp_start(&bp, &it);
 
 	while (bsp_getop(&op, &bp)) {
-		if (op.op == OP_CODESEPARATOR)
+		if (op.op == ccoin_OP_CODESEPARATOR)
 		    nCodeSeparators++;
 	}
 	cstring *x = cstr_new_sz(1024*8);
@@ -1675,7 +1677,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
 	bsp_start(&bp, &it);
 
 	while (bsp_getop(&op, &bp)) {
-	    if (op.op == OP_CODESEPARATOR) {
+	    if (op.op == ccoin_OP_CODESEPARATOR) {
 			ser_bytes(x, itBegin.p, it.p - itBegin.p - 1);
 			itBegin  = it;
 	    }

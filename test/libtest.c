@@ -167,7 +167,7 @@ cstring *parse_script_str(const char *enc)
 			 (token[strlen(token) - 1] == '\''))
 			bsp_push_data(script, &token[1], strlen(token) - 2);
 
-		else if (GetOpType(token) != OP_INVALIDOPCODE)
+		else if (GetOpType(token) != ccoin_OP_INVALIDOPCODE)
 			bsp_push_op(script, GetOpType(token));
 
 		else

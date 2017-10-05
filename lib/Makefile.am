@@ -54,6 +54,8 @@ libccoin_la_SOURCES=	\
 	utxo.c		\
 	wallet.c
 
+libccoin_la_LDFLAGS = -module -shared  -version-info 2:7:1
+
 noinst_LTLIBRARIES= libccoinnet.la libccoinaes.la
 
 libccoinnet_la_SOURCES=	\

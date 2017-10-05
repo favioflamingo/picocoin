@@ -197,8 +197,8 @@ static void test_decryption()
 
 int main(int argc, char **argv)
 {
-	test_encryption();
-	test_decryption();
+	//test_encryption();
+	//test_decryption();
 
 	return 0;
 }
