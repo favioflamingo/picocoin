@@ -37,3 +37,4 @@ picocoin*.deb
 .project
 test/core
 test/uahf-sighash
+test/uahf-script
