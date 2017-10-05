@@ -155,6 +155,14 @@ void bp_tx_sighash_with_value(bu256_t *hash, const cstring *scriptCode,
 	else{
 		bp_tx_sighash(hash,scriptCode,txTo,nIn,nHashType);
 	}
+
+
+	cstring *s = cstr_new_sz(32);
+	ser_u256(s,hash);
+	char hash_hex[65];
+	encode_hex(hash_hex,s->str,s->len);
+	fprintf(stderr,"hash=%s\n",hash_hex);
+	cstr_free(s,true);
 }
 
 
