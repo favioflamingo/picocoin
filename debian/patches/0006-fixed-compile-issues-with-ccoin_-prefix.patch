@@ -28,7 +28,7 @@ index da2f826..59c2ce0 100644
  noinst_LTLIBRARIES= libccoinnet.la libccoinaes.la
  
 diff --git a/lib/script_eval.c b/lib/script_eval.c
-index 635d575..4a7401f 100644
+index a891038..d690499 100644
 --- a/lib/script_eval.c
 +++ b/lib/script_eval.c
 @@ -91,7 +91,7 @@ void bp_tx_sigserializer(cstring *s, const cstring *scriptCode,

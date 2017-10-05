@@ -509,7 +509,7 @@ index 555ae62..69a67dc 100644
  	return script_out;
  }
 diff --git a/lib/script_eval.c b/lib/script_eval.c
-index dc7783d..635d575 100644
+index 1347629..a891038 100644
 --- a/lib/script_eval.c
 +++ b/lib/script_eval.c
 @@ -206,21 +206,21 @@ void bp_tx_sighash(bu256_t *hash, const cstring *scriptCode,
