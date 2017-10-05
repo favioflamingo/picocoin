@@ -519,30 +519,38 @@ bool static IsDefinedHashtypeSignature(const struct buffer *vchSig) {
 static bool CheckSignatureEncoding(const struct buffer *vchSig, unsigned int flags) {
     // Empty signature. Not strictly DER encoded, but allowed to provide a
     // compact way to provide an invalid signature for use with CHECK(MULTI)SIG
+	fprintf(stderr,"CheckSignatureEncoding - 1\n");
     if (vchSig->len == 0)
         return true;
-
-	if ((flags & (SCRIPT_VERIFY_DERSIG | SCRIPT_VERIFY_LOW_S | SCRIPT_VERIFY_STRICTENC)) != 0 && !IsValidSignatureEncoding(vchSig))
+    fprintf(stderr,"CheckSignatureEncoding - 2\n");
+	if ((flags & (SCRIPT_VERIFY_DERSIG | SCRIPT_VERIFY_LOW_S | SCRIPT_VERIFY_STRICTENC)) != 0 && !IsValidSignatureEncoding(vchSig)){
+		fprintf(stderr,"CheckSignatureEncoding - 2.1\n");
 		return false;
-    else if ((flags & SCRIPT_VERIFY_LOW_S) != 0 && !IsLowDERSignature(vchSig))
-		return false;
-
+	}
+    else if ((flags & SCRIPT_VERIFY_LOW_S) != 0 && !IsLowDERSignature(vchSig)){
+    	fprintf(stderr,"CheckSignatureEncoding - 2.2\n");
+    	return false;
+    }
     else if((flags & SCRIPT_VERIFY_STRICTENC) != 0){
+    	fprintf(stderr,"CheckSignatureEncoding - 2.3\n");
     	if(!IsDefinedHashtypeSignature(vchSig)){
     		return false;
     	}
+    	fprintf(stderr,"CheckSignatureEncoding - 2.4\n");
 
     	bool usesForkId = GetHashType(vchSig) & SIGHASH_FORKID_UAHF;
     	bool forkIdEnabled = flags & SCRIPT_ENABLE_SIGHASH_FORKID;
     	if (!forkIdEnabled && usesForkId) {
     		return false;
     	}
+    	fprintf(stderr,"CheckSignatureEncoding - 2.5\n");
     	if (forkIdEnabled && !usesForkId) {
     		return false;
     	}
+    	fprintf(stderr,"CheckSignatureEncoding - 2.6\n");
 
     }
-
+	fprintf(stderr,"CheckSignatureEncoding - 3\n");
     return true;
 }
 
