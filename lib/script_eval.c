@@ -1401,7 +1401,22 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
 			for (k = 0; k < nSigsCount; k++)
 			{
 				struct buffer *vchSig =stacktop(stack, -isig-k);
-				string_find_del(scriptCode, vchSig);
+
+				/*
+				 * gating code
+				 */
+				if (nHashType & SIGHASH_FORKID_UAHF) {
+					if (!(flags & SCRIPT_ENABLE_SIGHASH_FORKID)){
+						cstr_free(scriptCode, true);
+						rc = false;
+						goto out;
+					}
+
+				} else {
+					// Drop the signature in scripts when SIGHASH_FORKID is not used.
+					//scriptCode.FindAndDelete(CScript(vchSig));
+					string_find_del(scriptCode, vchSig);
+				}
 			}
 
 			bool fSuccess = true;
