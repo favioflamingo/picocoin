@@ -522,7 +522,7 @@ index 555ae62..69a67dc 100644
  	return script_out;
  }
 diff --git a/lib/script_eval.c b/lib/script_eval.c
-index a5935b0..2943298 100644
+index 731d923..4ee5054 100644
 --- a/lib/script_eval.c
 +++ b/lib/script_eval.c
 @@ -91,7 +91,7 @@ void bp_tx_sigserializer(cstring *s, const cstring *scriptCode,
@@ -1214,7 +1214,7 @@ index a5935b0..2943298 100644
  			// ([sig ...] num_of_signatures [pubkey ...] num_of_pubkeys -- bool)
  
  			int i = 1;
-@@ -1455,7 +1457,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
+@@ -1470,7 +1472,7 @@ static bool bp_script_eval_with_value(parr *stack, const cstring *script,
  
  			stack_push_str(stack, fSuccess ? bn_getvch(bn_One) : bn_getvch(bn_Zero));
  
@@ -1223,7 +1223,7 @@ index a5935b0..2943298 100644
  			{
  				if (fSuccess)
  					popstack(stack);
-@@ -1666,7 +1668,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
+@@ -1681,7 +1683,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
  	bsp_start(&bp, &it);
  
  	while (bsp_getop(&op, &bp)) {
@@ -1232,7 +1232,7 @@ index a5935b0..2943298 100644
  		    nCodeSeparators++;
  	}
  	cstring *x = cstr_new_sz(1024*8);
-@@ -1675,7 +1677,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
+@@ -1690,7 +1692,7 @@ void uahf_ser_scriptCode(cstring *s, const cstring *scriptCode){
  	bsp_start(&bp, &it);
  
  	while (bsp_getop(&op, &bp)) {

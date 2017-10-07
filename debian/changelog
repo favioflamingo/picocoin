@@ -1,3 +1,9 @@
+picocoin (0.6-2) jessie; urgency=medium
+
+  * fixing uahf multisig in script_eval
+
+ -- Joel Manuel De Jesus (Work Account) <dejesus.joel@e-flamingo.net>  Sat, 07 Oct 2017 20:41:04 +0900
+
 picocoin (0.6-1) jessie; urgency=medium
 
   * added tests for sighash
